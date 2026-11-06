@@ -28,13 +28,21 @@
     {id:'fortune',icon:'◆',name:'GLÜCK',desc:'Mehr Münzen und Powerups.',base:160,max:6}
   ];
   const WEAPONS = [
-    {id:'pistol',icon:'✦',name:'BLASTER',desc:'Ausgewogen und zuverlässig.',cost:0,rate:.34,damage:18,speed:690,shots:1,spread:0,color:'#7ff8ef'},
-    {id:'shotgun',icon:'✹',name:'SCHROTFLINTE',desc:'Fünf Kugeln auf kurze Distanz.',cost:500,rate:.72,damage:11,speed:610,shots:5,spread:.15,color:'#ffd18b'},
-    {id:'rifle',icon:'⌁',name:'STURMGEWEHR',desc:'Schnelle präzise Salven.',cost:850,rate:.2,damage:13,speed:790,shots:1,spread:0,color:'#b6f9ad'},
-    {id:'bow',icon:'➶',name:'JÄGERBOGEN',desc:'Pfeile durchdringen Monster.',cost:1100,rate:.62,damage:35,speed:750,shots:1,spread:0,color:'#dcc6ff',pierce:1},
-    {id:'brick',icon:'▦',name:'ZIEGELWERFER',desc:'Schwere Steine mit Flächenschaden.',cost:1500,rate:.9,damage:42,speed:500,shots:1,spread:0,color:'#ff9a83',splash:52},
-    {id:'football',icon:'◉',name:'FUSSBALLKANONE',desc:'Prallende Bälle treffen mehrfach.',cost:1750,rate:.8,damage:31,speed:590,shots:1,spread:0,color:'#f9fcff',bounce:2}
+    {id:'pistol',icon:'✦',name:'BLASTER',desc:'Ausgewogen und zuverlässig.',cost:0,rate:.43,damage:18,speed:690,shots:1,spread:0,color:'#7ff8ef'},
+    {id:'shotgun',icon:'✹',name:'SCHROTFLINTE',desc:'Fünf Kugeln auf kurze Distanz.',cost:500,rate:.82,damage:11,speed:610,shots:5,spread:.15,color:'#ffd18b'},
+    {id:'rifle',icon:'⌁',name:'STURMGEWEHR',desc:'Schnelle präzise Salven.',cost:850,rate:.27,damage:13,speed:790,shots:1,spread:0,color:'#b6f9ad'},
+    {id:'bow',icon:'➶',name:'JÄGERBOGEN',desc:'Pfeile durchdringen Monster.',cost:1100,rate:.72,damage:35,speed:750,shots:1,spread:0,color:'#dcc6ff',pierce:1},
+    {id:'brick',icon:'▦',name:'ZIEGELWERFER',desc:'Schwere Steine mit Flächenschaden.',cost:1500,rate:1,damage:42,speed:500,shots:1,spread:0,color:'#ff9a83',splash:52},
+    {id:'football',icon:'◉',name:'FUSSBALLKANONE',desc:'Prallende Bälle treffen mehrfach.',cost:1750,rate:.9,damage:31,speed:590,shots:1,spread:0,color:'#f9fcff',bounce:2}
   ];
+  const BOSS_PATTERNS = {
+    grass:{normal:'DORNENFÄCHER',super:'WURZELFALLE',normalWarn:.72,superWarn:1.05},
+    desert:{normal:'SANDLANZEN',super:'SANDSTURM',normalWarn:.72,superWarn:1.05},
+    grave:{normal:'GEISTERSICHEL',super:'GRABRUF',normalWarn:.72,superWarn:1.05},
+    volcano:{normal:'LAVAKUGEL',super:'ERUPTION',normalWarn:.78,superWarn:1.1},
+    frost:{normal:'EISSPLITTER',super:'FROSTNOVA',normalWarn:.72,superWarn:1.05},
+    neon:{normal:'ENERGIESTRAHL',super:'KREUZBLITZ',normalWarn:.8,superWarn:1.1}
+  };
   const PERKS = [
     {id:'arrows',icon:'➶',name:'AUTOPFEILE',desc:'Schießt selbstständig auf Monster.',cost:900,interval:1.35},
     {id:'bricks',icon:'▦',name:'ZIEGELREGEN',desc:'Wirft automatisch Ziegel.',cost:1300,interval:2.1},
@@ -72,6 +80,7 @@
   function upgradeCost(upgrade,level){return Math.round(upgrade.base*Math.pow(1.52,level));}
   function pointCost(level){return 1+Math.floor(level/2);}
   function weaponInterval(weapon,rateLevel,rapid){return rapid?0.085:Math.max(.12,weapon.rate*Math.pow(.9,rateLevel));}
+  function waveSize(info,wave){return info.boss&&wave===3?1:Math.min(7+Math.floor(info.local*.44)+info.mapIndex*2+wave*3,28);}
   const finiteInt=(value,fallback,min,max)=>Number.isFinite(Number(value))?clamp(Math.floor(Number(value)),min,max):fallback;
   function defaultSave(){
     return {coins:0,unlocked:1,best:0,xp:0,xpLevel:1,skillPoints:0,
@@ -108,5 +117,5 @@
     s.weapons=['pistol','rifle','bow'];s.perks=['arrows','orb'];s.tutorialDone=true;
     return s;
   }
-  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,defaultSave,sanitizeSave,adminSave};
+  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave};
 });

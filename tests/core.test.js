@@ -18,6 +18,33 @@ test('six maps contain thirty levels each and finish with a boss', () => {
   assert.equal(C.levelInfo(181).global, 180);
 });
 
+test('every map boss has a distinct normal and super attack with fair warning', () => {
+  const normals = new Set();
+  const supers = new Set();
+  for (const map of C.MAPS) {
+    const attack = C.BOSS_PATTERNS[map.id];
+    assert.ok(attack);
+    assert.ok(attack.normalWarn >= 0.6);
+    assert.ok(attack.superWarn >= 0.9);
+    assert.ok(attack.normal !== attack.super);
+    normals.add(attack.normal);
+    supers.add(attack.super);
+  }
+  assert.equal(normals.size, C.MAPS.length);
+  assert.equal(supers.size, C.MAPS.length);
+});
+
+test('waves grow harder and a map boss finishes its third wave', () => {
+  const early = C.levelInfo(1);
+  const late = C.levelInfo(29);
+  assert.ok(C.waveSize(early, 1) < C.waveSize(early, 2));
+  assert.ok(C.waveSize(early, 1) >= 10);
+  assert.ok(C.waveSize(early, 2) < C.waveSize(early, 3));
+  assert.ok(C.waveSize(late, 1) > C.waveSize(early, 1));
+  assert.equal(C.waveSize(C.levelInfo(30), 3), 1);
+  assert.equal(C.waveSize(C.levelInfo(60), 3), 1);
+});
+
 test('movement is equally fast on both axes and diagonal movement is normalized', () => {
   const speed = 225;
   const x = C.normalize(1, 0);
@@ -39,6 +66,7 @@ test('upgrades become more expensive and XP requirements increase', () => {
 });
 
 test('normal shots have a cooldown and rapid fire has a safe fixed interval', () => {
+  assert.equal(C.weaponInterval(C.WEAPONS.find(w => w.id === 'pistol'), 0, false), 0.43);
   for (const weapon of C.WEAPONS) {
     const normal = C.weaponInterval(weapon, 0, false);
     const rapid = C.weaponInterval(weapon, 0, true);
