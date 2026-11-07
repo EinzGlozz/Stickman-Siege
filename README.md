@@ -1,4 +1,4 @@
-# Stickman Siege · Version 4
+# Stickman Siege · Version 10
 
 Ein 2D-Stickman-Shooter für Handy und Computer. Du kämpfst gegen Zombies, Skelette, Ghule, Golems, Geister und Dämonen, sammelst Münzen, XP und animierte Powerups, kaufst Upgrades und besiegst Kartenbosse.
 
@@ -14,11 +14,41 @@ Diese ChatGPT-Site ist derzeit für den Besitzerzugang freigegeben. Öffne den L
 | --- | --- |
 | **Android** | Den Spiel-Link in **Chrome** öffnen → Menü **⋮** → **App installieren** oder **Zum Startbildschirm hinzufügen**. |
 | **iPhone / iPad** | Den Spiel-Link in **Safari** öffnen → **Teilen** → **Zum Home-Bildschirm** → **Hinzufügen**. |
-| **PC / Mac** | [Offline-Paket als ZIP herunterladen](https://github.com/EinzGlozz/Stickman-Siege/raw/refs/heads/main/downloads/Stickman-Siege-PC-v4.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
+| **PC / Mac** | [Offline-Paket als ZIP herunterladen](downloads/Stickman-Siege-PC-v10.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
 
 Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dieser Version keine signierte APK- oder IPA-Datei. Für eine eigenständige Store-App wären Android-Buildwerkzeuge beziehungsweise ein Apple-Entwicklerkonto und Code-Signierung nötig. Das PC-ZIP enthält die Spieldateien für die Offline-Nutzung.
 
-## Das steckt in Version 4
+## Neu in Version 10
+
+- **Lebendigere Karten:** Kleine, kartenfarbene Lichtpunkte und ein sanft pulsierender Ring am Startbereich beleben die Arena. Der Partikelregler steuert ihre Stärke; bei 0 % oder aktivierter Option für reduzierte Bewegung bleiben sie aus.
+- **Leuchtende Menüs und Buttons:** Langsam wandernde Hintergrundakzente, sanfte Lichtläufe auf Schaltflächen und ein pulsierender Feuerknopf. „Menü-Effekte“ im Grafik-Reiter schaltet die Menüanimationen aus; reduzierte Bewegung wird berücksichtigt.
+
+## Seit Version 9 enthalten
+
+- **Klarer Levelstart:** Jede Karte beginnt in einer freien Zone in der Mitte. Eine dezente Markierung zeigt den Startbereich; die Kamera hält die Figur beim Tutorial etwas höher, damit die Anleitung sie nicht verdeckt.
+- **Übersichtliches Querformat:** Kartenname, Leben, Münzen und XP stehen in einer kompakten Zeile. Die Tutorial-Anleitung sitzt zwischen Joystick und Feuerknopf. Das Startmenü passt ohne abgeschnittene Überschrift auf kleine Handybildschirme.
+- **Ruhigeres Grasland:** Kleinere Bodenflecken ersetzen die großen ovalen Flächen.
+
+## Seit Version 8 enthalten
+
+- **Verstecktes Admin-Menü:** Tippe auf der Startseite zweimal schnell auf den roten Punkt nach „SIEGE“. Am PC kann der Punkt zweimal per Maus oder Enter aktiviert werden. Der Admin-Schalter erscheint nicht mehr in den allgemeinen Einstellungen.
+- **Mehr Admin-Einstellungen:** Im Admin-Labor kannst du Unverwundbarkeit und „Ein Treffer“ aktivieren sowie Monstertempo und Spawnrate einstellen. Diese Optionen wirken ausschließlich im lokalen Admin-Testprofil und werden getrennt vom normalen Spielstand gespeichert.
+
+## Seit Version 7 enthalten
+
+- **Spielstand sichern:** Einstellungen → „Sicherung herunterladen“ speichert das normale Spielerprofil als JSON-Datei. Das Admin-Testprofil wird nicht exportiert.
+- **Spielstand wiederherstellen:** Eine Sicherungsdatei wird vorab geprüft. Eine Vorschau zeigt Münzen, Kartenfortschritt und Skin. Erst „Diesen Stand wiederherstellen“ ersetzt den normalen Spielstand. Der vorherige Stand lässt sich anschließend über „Letzten Stand zurückholen“ wiederherstellen.
+- **Handywechsel:** Öffne die Site auf dem neuen Gerät und wähle in den Einstellungen die heruntergeladene Sicherung aus. Die Datei bleibt bei dir; es gibt keine Cloud-Synchronisierung.
+
+## Bereits enthalten
+
+- **Startseite:** Der Stickman bewegt Körper, Arme und Beine mit einer dezenten, flüssigen Idle-Animation. Die Animation lässt sich im Grafik-Reiter ausschalten und respektiert reduzierte Bewegung des Betriebssystems.
+- **Einstellungen aus der Pause:** Ton, Grafik, Handy-Steuerung und PC-Steuerung sind während einer pausierten Runde erreichbar. Zurück führt in die Pause, ohne die Runde fortzusetzen.
+- **Neuer Klang:** Ein dichterer Rhythmus für normale Levels und Bosskämpfe; leisere SFX und ein Audiobegrenzer reduzieren Übersteuerung.
+- **Vier Einstellungsreiter:** Ton, Grafik, Handy-Steuerung und PC-Steuerung. Grafik bietet Regler für Partikel, Kamerawackeln und Menüanimation.
+
+- **Interaktive Trainingskarte:** Sieben echte Aufgaben führen durch Bewegung, Schießen, Beute, Deckung, Powerup, Probe-Upgrade und Bosskampf. Die Karte wird beim ersten Spielstart automatisch angeboten und kann später über das Menü wiederholt werden. Überspringen ist möglich; der Fortschritt bleibt dann ohne Belohnung.
+- **Einmaliger Abschlussbonus:** Erst nach dem besiegten Übungsboss erhält das normale Profil 300 Münzen. Trainingsbeute ist nur zur Übung. Wiederholungen und das Admin-Testprofil geben keinen weiteren Bonus.
 
 - **6 Karten mit je 30 Levels:** Grasland, Wüste, Friedhof, Vulkaninsel, Frostfestung und Neonruinen. Level 30 jeder Karte enthält einen Boss und schaltet die nächste Karte frei.
 - **Monster mit eigenen Angriffen:** Zombies und Ghule greifen im Nahkampf an, Skelette schießen Pfeile. Jeder Kartenboss besitzt eine eigene normale und eine eigene Superattacke: Dornen/Wurzeln, Sandlanzen/Sandsturm, Geister/Grabruf, Lavakugel/Eruption, Eissplitter/Frostnova oder Energiestrahl/Kreuzblitz. Die Angriffe werden vor dem Treffer sichtbar angekündigt.
@@ -27,7 +57,7 @@ Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dies
 - **Ausrüstung:** Acht teurer werdende Upgrades, sechs Waffen, drei gleichzeitig ausrüstbare Waffen und zwei automatische Perks wie Pfeile, Ziegel oder Fußbälle.
 - **Skins:** Spider-Man, Batman, Wolverine, Hulk, Iron Man, Thor und Schattenninja kosten Münzen und besitzen eigene Spezialattacken und Animationen. Die Figuren sind Fan-Inhalte; es besteht keine Verbindung zu den Rechteinhabern.
 - **Steuerung und Klang:** Einstellbare Lautstärken für Musik und Effekte, frei belegbare Computertasten und anpassbare Positionen der Handy-Buttons. Die Musik wird im Browser erzeugt und wechselt im Bosskampf das Tempo.
-- **Tutorial und Admin-Testprofil:** Das Tutorial erklärt die Grundlagen in sechs Schritten. In den Einstellungen lässt sich ein lokales Admin-Testprofil mit unbegrenzten Ressourcen und allen Freischaltungen aktivieren. Es ist kein Online-Konto und bietet keine Zugriffssicherheit.
+- **Admin-Testprofil:** Im versteckten Admin-Labor lässt sich ein lokales Testprofil mit unbegrenzten Ressourcen und allen Freischaltungen aktivieren. Es ist kein Online-Konto und bietet keine Zugriffssicherheit.
 
 ## Steuerung
 
@@ -40,6 +70,6 @@ Die Tastaturbelegung und die Positionen der Handy-Buttons lassen sich im Einstel
 
 ## Entwicklung und Tests
 
-Die Web-App liegt in `dist/` und benötigt zur Laufzeit keine externen Pakete. Für einen lokalen Test: `python3 -m http.server 8765 --directory dist`, dann `http://localhost:8765` öffnen. Regeltests: `node --test tests/core.test.js`.
+Die Web-App liegt in `dist/` und benötigt zur Laufzeit keine externen Pakete. Für einen lokalen Test: `python3 -m http.server 8765 --directory dist`, dann `http://localhost:8765` öffnen. Regel- und Tutorialtests: `node --test tests/*.test.js`.
 
 `tools/generate_icons.py` erzeugt die App-Icons. Der Quellcode liegt auch im [GitHub-Repository](https://github.com/EinzGlozz/Stickman-Siege). GitHub Pages ist zusätzlich nutzbar, sobald es im Repository unter **Settings → Pages → Deploy from a branch → main / (root)** aktiviert wird.

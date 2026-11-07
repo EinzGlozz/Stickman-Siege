@@ -1,14 +1,24 @@
-# QA-Feedback · Version 4
+# QA-Feedback · Version 10
+
+Version 10 wurde im lokalen Browser bei 568 × 320 Pixeln geprüft. Startmenü und Tutorial blieben trotz der neuen Lichtakzente lesbar; der Grafikregler „Menü-Effekte“ deaktivierte die CSS-Animationen und ließ sie danach wieder zu. Die Browser-Konsole zeigte keine JavaScript-Fehler. Die Kartenlichter hängen am vorhandenen Partikelregler und werden bei reduzierter Bewegung ausgelassen.
 
 ## Automatische Tests
 
-- `node --test tests/core.test.js`: 8 von 8 bestanden.
+- `node --test tests/*.test.js`: 17 von 17 bestanden. Neu geprüft: Der Startpunkt liegt auf allen sechs Karten und ihren Bosslevels in einer freien Zone; die Kamera zeigt die Figur im Tutorial oberhalb der Anleitung.
 - `node --check` für `core.js`, `game.js` und `sw.js`: bestanden.
 - `git diff --check`: bestanden.
 
 ## Browserprüfung
 
-Die lokale Version wurde im Browser im Handy-Querformat (844 × 390) und Handy-Hochformat (390 × 844) geöffnet. Im Hochformat erschien die Sperre; der Lebenswert blieb während 1,3 Sekunden unverändert. Alle sechs normalen und sechs Superattacken wurden über den nur auf localhost verfügbaren Boss-Teststart ausgelöst. Die Browser-Konsole zeigte dabei keine JavaScript-Fehler. Die Neon-Superattacke wurde vor dem Treffer als Kreuz angezeigt; danach sank der Lebenswert von 340 auf 287.
+Version 9 wurde im lokalen Browser bei 568 × 320, 667 × 375 und 844 × 390 Pixeln geprüft. Vor der Korrektur überlappten Kartenname, Leben und Ressourcen in der schmalen Ansicht, während das Tutorial Joystick und Figur teilweise verdeckte. Nach der Korrektur sind HUD, Spielfigur, Tutorialkarte und Touch-Buttons getrennt. Startmenü, Kartenübersicht, Tutorial sowie Grasland- und Neon-Level wurden sichtbar geprüft. Die Browser-Konsole zeigte keine JavaScript-Fehler.
+
+In Version 8 wurde das versteckte Admin-Labor und der Profilwechsel geprüft.
+
+In Version 7 wurden Sicherungsmenü und Dateivorschau geprüft. Eine Testdatei mit 1234 Münzen, Wüste Level 2 und Spider-Man wurde eingespielt und anschließend per „Letzten Stand zurückholen“ rückgängig gemacht. Die Schaltfläche für den Download meldete Erfolg; ein tatsächlicher Dateidownload konnte im Testbrowser nicht als Datei abgefangen werden.
+
+In Version 6 wurden die dezente Startseitenfigur, alle vier Einstellungsreiter und der Weg Pause → Einstellungen → Pause sichtbar geprüft. Während der Rückkehr aus den Einstellungen blieb die Lebensanzeige bei 295/340; die Runde lief im Hintergrund nicht weiter. Der Reiterbereich wurde bei 844 × 390 geprüft.
+
+Aus Version 4 stammt die Prüfung der Querformatsperre sowie aller sechs normalen und sechs Superattacken. Die Neon-Superattacke wurde vor dem Treffer als Kreuz angezeigt.
 
 ## Gefundene und behobene Punkte
 
@@ -20,5 +30,7 @@ Die lokale Version wurde im Browser im Handy-Querformat (844 × 390) und Handy-H
 6. Version 4 ergänzt ausschließliches Querformat, zwölf kartenspezifische Bossmuster und schwierigere Wellen mit längerer normaler Schusspause.
 
 ## Grenzen
+
+Die neue Musik und SFX wurden technisch im Browser gestartet, aber noch nicht auf echten Lautsprechern oder Kopfhörern probegehört. Der automatisierte Tutorialtest führt den Spielcode mit simulierten Eingaben aus; ein vollständiger Tutorial-Durchlauf auf einem echten Handy steht noch aus.
 
 Es wurde kein vollständiger Durchlauf aller 180 Levels auf realen Android- und iOS-Geräten durchgeführt. Das Admin-Profil ist ein lokaler Testmodus ohne Server-Authentifizierung. Android und iOS werden als installierbare Web-App bereitgestellt; native APK-/IPA-Dateien sind nicht enthalten.

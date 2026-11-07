@@ -97,6 +97,29 @@ test('saved data is bounded and cannot equip unowned items', () => {
   assert.equal(save.settings.keys.fire, 'f');
 });
 
+test('backup roundtrip preserves purchased equipment and the tutorial reward flag', () => {
+  const save=C.defaultSave();
+  save.coins=731;save.unlocked=34;save.ownedSkins.push('spider');save.skin='spider';
+  save.ownedWeapons.push('bow');save.weapons=['pistol','bow'];save.tutorialRewardClaimed=true;
+  const restored=C.readBackup(JSON.parse(JSON.stringify(C.createBackup(save))));
+  assert.equal(restored.coins,731);
+  assert.equal(restored.unlocked,34);
+  assert.equal(restored.skin,'spider');
+  assert.deepEqual(restored.weapons,['pistol','bow']);
+  assert.equal(restored.tutorialRewardClaimed,true);
+});
+
+test('backup import rejects unrelated or incomplete files and sanitizes values', () => {
+  assert.throws(()=>C.readBackup({format:'other',version:1,save:C.defaultSave()}));
+  assert.throws(()=>C.readBackup({format:C.BACKUP_FORMAT,version:2,save:C.defaultSave()}));
+  assert.throws(()=>C.readBackup({format:C.BACKUP_FORMAT,version:1,save:{coins:10}}));
+  const backup=C.createBackup(C.defaultSave());
+  backup.save.coins=-100;
+  backup.save.unlocked=9999;
+  assert.equal(C.readBackup(backup).coins,0);
+  assert.equal(C.readBackup(backup).unlocked,C.MAX_LEVEL);
+});
+
 test('admin test profile has all maps, equipment and resources', () => {
   const admin = C.adminSave();
   assert.equal(admin.unlocked, C.MAX_LEVEL);
@@ -105,4 +128,45 @@ test('admin test profile has all maps, equipment and resources', () => {
   assert.equal(admin.ownedPerks.length, C.PERKS.length);
   assert.ok(admin.coins > 1_000_000);
   assert.ok(admin.skillPoints > 1_000);
+});
+
+test('admin controls stay bounded and separate from player backups', () => {
+  assert.deepEqual(C.sanitizeAdminOptions({}),{invincible:false,oneHit:false,enemySpeed:100,spawnRate:100});
+  assert.deepEqual(C.sanitizeAdminOptions({invincible:true,oneHit:true,enemySpeed:900,spawnRate:-5}),{invincible:true,oneHit:true,enemySpeed:150,spawnRate:50});
+  const backup=C.createBackup(C.defaultSave());
+  assert.equal(Object.hasOwn(backup.save,'adminOptions'),false);
+});
+
+test('interactive tutorial awards coins only after completion and only once', () => {
+  const save = C.defaultSave();
+  assert.equal(save.coins, 0);
+  save.tutorialSkipped = true;
+  assert.equal(C.completeTutorial(save), C.TUTORIAL_REWARD);
+  assert.equal(save.coins, 300);
+  assert.equal(save.tutorialDone, true);
+  assert.equal(save.tutorialSkipped, false);
+  assert.equal(C.completeTutorial(save), 0);
+  assert.equal(save.coins, 300);
+  const restored = C.sanitizeSave(JSON.parse(JSON.stringify(save)));
+  assert.equal(C.completeTutorial(restored), 0);
+  assert.equal(restored.coins, 300);
+  const oldSave = C.sanitizeSave({tutorialDone:true,coins:10});
+  assert.equal(C.completeTutorial(oldSave), 300);
+  assert.equal(oldSave.coins, 310);
+  const admin = C.adminSave();
+  const coins = admin.coins;
+  assert.equal(C.completeTutorial(admin,true), 0);
+  assert.equal(admin.coins, coins);
+});
+
+test('graphics options load safely from older saves and stay within bounds', () => {
+  const old = C.sanitizeSave({settings:{music:42}});
+  assert.equal(old.settings.music,42);
+  assert.equal(old.settings.particles,75);
+  assert.equal(old.settings.shake,65);
+  assert.equal(old.settings.menuMotion,1);
+  const custom = C.sanitizeSave({settings:{particles:130,shake:-20,menuMotion:0}});
+  assert.equal(custom.settings.particles,100);
+  assert.equal(custom.settings.shake,0);
+  assert.equal(custom.settings.menuMotion,0);
 });

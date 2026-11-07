@@ -16,6 +16,7 @@
     {id:'neon',name:'NEONRUINEN',subtitle:'Die letzte Arena',ground:'#1d253c',tile:'#273651',line:'#7589f050',accent:'#a3b2ff',cover:'#3e4b70',edge:'#a7aaf5',boss:'NACHTTITAN'}
   ];
   const MAX_LEVEL = MAPS.length * LEVELS_PER_MAP;
+  const TUTORIAL_REWARD = 300;
 
   const UPGRADES = [
     {id:'damage',icon:'✷',name:'SCHADEN',desc:'Mehr Schaden pro Treffer.',base:90,max:10},
@@ -85,8 +86,8 @@
   function defaultSave(){
     return {coins:0,unlocked:1,best:0,xp:0,xpLevel:1,skillPoints:0,
       upgrades:Object.fromEntries(UPGRADES.map(u=>[u.id,0])),
-      ownedSkins:['soldier'],skin:'soldier',ownedWeapons:['pistol'],weapons:['pistol'],ownedPerks:[],perks:[],tutorialDone:false,
-      settings:{master:70,music:38,sfx:75,joyX:6,joyY:7,fireX:6,fireY:8,keys:{up:'w',down:'s',left:'a',right:'d',fire:' ',pause:'p'}}};
+      ownedSkins:['soldier'],skin:'soldier',ownedWeapons:['pistol'],weapons:['pistol'],ownedPerks:[],perks:[],tutorialDone:false,tutorialSkipped:false,tutorialRewardClaimed:false,
+      settings:{master:70,music:38,sfx:75,particles:75,shake:65,menuMotion:1,joyX:6,joyY:7,fireX:6,fireY:8,keys:{up:'w',down:'s',left:'a',right:'d',fire:' ',pause:'p'}}};
   }
   function sanitizeSave(raw){
     const d=defaultSave(),s=raw&&typeof raw==='object'?raw:{};
@@ -104,8 +105,9 @@
       ownedSkins,skin:ownedSkins.includes(s.skin)?s.skin:'soldier',ownedWeapons,
       weapons:validIds(s.weapons,WEAPONS).filter(id=>ownedWeapons.includes(id)).slice(0,3).length?validIds(s.weapons,WEAPONS).filter(id=>ownedWeapons.includes(id)).slice(0,3):['pistol'],
       ownedPerks,perks:validIds(s.perks,PERKS).filter(id=>ownedPerks.includes(id)).slice(0,2),
-      tutorialDone:!!s.tutorialDone,
+      tutorialDone:!!s.tutorialDone,tutorialSkipped:!!s.tutorialSkipped,tutorialRewardClaimed:!!s.tutorialRewardClaimed,
       settings:{master:finiteInt(settings.master,d.settings.master,0,100),music:finiteInt(settings.music,d.settings.music,0,100),sfx:finiteInt(settings.sfx,d.settings.sfx,0,100),
+        particles:finiteInt(settings.particles,d.settings.particles,0,100),shake:finiteInt(settings.shake,d.settings.shake,0,100),menuMotion:finiteInt(settings.menuMotion,d.settings.menuMotion,0,1),
         joyX:finiteInt(settings.joyX,d.settings.joyX,1,36),joyY:finiteInt(settings.joyY,d.settings.joyY,1,36),
         fireX:finiteInt(settings.fireX,d.settings.fireX,1,36),fireY:finiteInt(settings.fireY,d.settings.fireY,1,36),keys}
     };
@@ -114,8 +116,26 @@
     const s=defaultSave();s.coins=999999999;s.unlocked=MAX_LEVEL;s.best=MAX_LEVEL;s.xpLevel=999;s.skillPoints=99999;
     for(const u of UPGRADES)s.upgrades[u.id]=u.max;
     s.ownedSkins=SKINS.map(x=>x.id);s.ownedWeapons=WEAPONS.map(x=>x.id);s.ownedPerks=PERKS.map(x=>x.id);
-    s.weapons=['pistol','rifle','bow'];s.perks=['arrows','orb'];s.tutorialDone=true;
+    s.weapons=['pistol','rifle','bow'];s.perks=['arrows','orb'];s.tutorialDone=true;s.tutorialRewardClaimed=true;
     return s;
   }
-  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave};
+  function sanitizeAdminOptions(raw){
+    const s=raw&&typeof raw==='object'?raw:{};
+    return {invincible:!!s.invincible,oneHit:!!s.oneHit,enemySpeed:finiteInt(s.enemySpeed,100,50,150),spawnRate:finiteInt(s.spawnRate,100,50,200)};
+  }
+  function completeTutorial(save,adminMode=false){
+    const awarded=!adminMode&&!save.tutorialRewardClaimed?TUTORIAL_REWARD:0;
+    save.tutorialDone=true;save.tutorialSkipped=false;save.tutorialRewardClaimed=true;
+    save.coins=clamp(save.coins+awarded,0,999999999);
+    return awarded;
+  }
+  const BACKUP_FORMAT='stickman-siege-save';
+  function createBackup(save){return {format:BACKUP_FORMAT,version:1,save:sanitizeSave(save)};}
+  function readBackup(data){
+    if(!data||typeof data!=='object'||data.format!==BACKUP_FORMAT||data.version!==1)throw new Error('Das ist keine unterstützte Stickman-Siege-Sicherung.');
+    const s=data.save;
+    if(!s||typeof s!=='object'||!Number.isFinite(s.coins)||!Number.isFinite(s.unlocked)||!s.upgrades||typeof s.upgrades!=='object'||!Array.isArray(s.ownedWeapons)||!Array.isArray(s.ownedSkins)||!s.settings||typeof s.settings!=='object')throw new Error('Die Sicherungsdatei ist unvollständig oder beschädigt.');
+    return sanitizeSave(s);
+  }
+  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,TUTORIAL_REWARD,BACKUP_FORMAT,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave,sanitizeAdminOptions,completeTutorial,createBackup,readBackup};
 });
