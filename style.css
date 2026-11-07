@@ -120,3 +120,14 @@
 .settings-tabs button.selected{border-color:#5de8de;background:#1a4a51;color:#dcfffa;box-shadow:inset 0 -3px #62e8dd}
 .settings-grid{display:block}.settings-grid .settings-card{max-width:640px;min-height:185px}.settings-card .setting-slider{max-width:520px}
 @media(max-height:590px){.settings-panel .panel-header{margin-bottom:14px}.settings-panel h2{font-size:clamp(47px,6vw,70px);margin-bottom:13px}.settings-tabs{margin-bottom:10px}.settings-tabs button{min-height:36px}.settings-grid .settings-card{min-height:0;padding:14px 18px}.settings-card h3{font-size:24px;margin-bottom:9px}.settings-card p{margin-bottom:9px}.setting-slider{margin:9px 0}.settings-actions{margin:12px 0}}
+.hero h1 .admin-trigger{display:inline-block;vertical-align:baseline;padding:0 .025em;border:0;background:none;color:#f46e6a;font:inherit;line-height:.72;letter-spacing:0;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.hero h1 .admin-trigger:hover{color:#ffaaa0}
+.admin-panel .panel-header{margin-bottom:25px}.admin-panel h2{margin-bottom:12px}
+.admin-panel>.primary-button{width:min(100%,640px);margin:16px 0 20px}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:850px}
+.admin-option{min-height:104px;border:1px solid #36566b;background:#102638;padding:16px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.admin-option strong{display:block;font-size:13px;letter-spacing:.08em}.admin-option small{display:block;color:#9cb7c2;font-size:11px;line-height:1.35;margin-top:5px}
+.admin-option input[type=checkbox]{width:25px;height:25px;accent-color:#5ce6de}.admin-option input[type=range]{width:125px;accent-color:#5ce6de}
+.admin-option output{grid-column:2;text-align:right;color:#73eae1;font-size:12px;font-weight:900}
+@media(max-width:720px){.admin-grid{grid-template-columns:1fr}.admin-option{min-height:76px}.admin-panel .panel-header{margin-bottom:14px}.admin-panel h2{font-size:clamp(48px,8vw,70px)}}
+@media(max-height:450px){.admin-option{min-height:66px;padding:10px 14px}.admin-panel>.primary-button{min-height:42px;margin:8px 0 12px}}

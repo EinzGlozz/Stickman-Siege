@@ -3,16 +3,20 @@
   const C=window.SiegeCore, $=id=>document.getElementById(id);
   if(!C) throw new Error('SiegeCore fehlt');
   const canvas=$('game'),ctx=canvas.getContext('2d');
-  const screens=['menu','levelsScreen','shopScreen','settingsScreen','tutorialScreen','pauseScreen','resultScreen'];
+  const screens=['menu','levelsScreen','shopScreen','settingsScreen','adminScreen','tutorialScreen','pauseScreen','resultScreen'];
   let regular;
   try{regular=C.sanitizeSave(JSON.parse(localStorage.getItem('stickman-siege-v3')||localStorage.getItem('stickman-siege-v1')||'{}'));}
   catch{regular=C.defaultSave();}
   const admin=C.adminSave();admin.settings=regular.settings;
   let adminMode=false;
   try{adminMode=localStorage.getItem('stickman-siege-profile')==='admin';}catch{}
+  let adminOptions;
+  try{adminOptions=C.sanitizeAdminOptions(JSON.parse(localStorage.getItem('stickman-siege-admin-options')||'{}'));}
+  catch{adminOptions=C.sanitizeAdminOptions({});}
   let save=adminMode?admin:regular;
   function persist(){if(adminMode)return;try{localStorage.setItem('stickman-siege-v3',JSON.stringify(regular));}catch{}}
-  function changeProfile(){adminMode=!adminMode;save=adminMode?admin:regular;try{localStorage.setItem('stickman-siege-profile',adminMode?'admin':'player');}catch{}renderSettings();renderMenu();toast(adminMode?'ADMIN-PROFIL AKTIV':'SPIELER-PROFIL AKTIV');}
+  function changeProfile(){adminMode=!adminMode;save=adminMode?admin:regular;try{localStorage.setItem('stickman-siege-profile',adminMode?'admin':'player');}catch{}renderAdminPanel();renderMenu();toast(adminMode?'ADMIN-PROFIL AKTIV':'SPIELER-PROFIL AKTIV');}
+  function persistAdminOptions(){try{localStorage.setItem('stickman-siege-admin-options',JSON.stringify(adminOptions));}catch{}}
   const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',settingsTab:'sound',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
   const trainingMap={...C.MAPS[0],name:'TRAININGSGELÄNDE',subtitle:'Dein erster Einsatz',ground:'#173d43',tile:'#29545a',line:'#8fe9dd55',accent:'#79f2e3',cover:'#3b7374',edge:'#a0dcd1',boss:'ÜBUNGSWÄCHTER'};
   const world={viewW:0,viewH:0,dpr:1,mapW:2200,mapH:2200,cameraX:0,cameraY:0,obstacles:[],decor:[]};
@@ -181,7 +185,7 @@
     }
     player.attackAnim=.22;burst(player.x+Math.cos(a)*25,player.y+Math.sin(a)*25,w.color,3,65);sfx('shot');return true;
   }
-  function damageEnemy(e,amount,x=e.x,y=e.y){if(!enemies.includes(e))return;if(e.trainingGuard){e.hit=.13;return;}e.hp-=amount;e.hit=.13;burst(x,y,enemyDefs[e.type].color,4,55);sfx('hit');if(e.hp<=0)enemyDead(e);}
+  function damageEnemy(e,amount,x=e.x,y=e.y){if(!enemies.includes(e))return;if(e.trainingGuard){e.hit=.13;return;}e.hp-=adminMode&&adminOptions.oneHit?e.hp:amount;e.hit=.13;burst(x,y,enemyDefs[e.type].color,4,55);sfx('hit');if(e.hp<=0)enemyDead(e);}
   function areaDamage(x,y,r,amount){for(const e of [...enemies])if(Math.hypot(e.x-x,e.y-y)<r+e.r)damageEnemy(e,amount);}
   function specialAttack(a){
     if(player.specialCooldown>0)return;
@@ -283,7 +287,7 @@
     else{const power=C.POWERUPS.find(x=>x.id===p.power);if(power.id==='heal')player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.35);else player.buffs[power.id]=Math.max(player.buffs[power.id],power.duration);if(power.id==='rapid')for(const id in player.cooldowns)player.cooldowns[id]=0;toast(power.name);sfx('power');flashEffect('ring',p.x,p.y,power.color,.45,{r:72});}
     updateHud();
   }
-  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0)return;if(state.mode==='tutorial'){player.invuln=.45;flashEffect('ring',player.x,player.y,'#78f6e5',.3,{r:30});return;}const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;state.flash=.17;burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
+  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0||adminMode&&adminOptions.invincible)return;if(state.mode==='tutorial'){player.invuln=.45;flashEffect('ring',player.x,player.y,'#78f6e5',.3,{r:30});return;}const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;state.flash=.17;burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
   function finish(won){
     if(state.mode!=='playing'||orientationBlocked)return;
     if(won)for(const p of [...pickups])if(p.kind==='coin'||p.kind==='xp')collectPickup(p);
@@ -305,7 +309,8 @@
     if(cover){const gap=e.r+20,corners=[{x:cover.x-gap,y:cover.y-gap},{x:cover.x+cover.w+gap,y:cover.y-gap},{x:cover.x-gap,y:cover.y+cover.h+gap},{x:cover.x+cover.w+gap,y:cover.y+cover.h+gap}];corners.sort((a,b)=>(dist(e,a)+dist(a,player))-(dist(e,b)+dist(b,player)));const wp=corners.find(c=>!firstCover(e.x,e.y,c.x,c.y,e.r*.2))||corners[0];tx=wp.x;ty=wp.y;movement=1;}
     if(e.type==='boss'&&e.charge)movement=0;
     const td=Math.hypot(tx-e.x,ty-e.y)||1,slow=(e.slow>0?.46:1)*(player.buffs.slow>0?.55:1),ox=e.x,oy=e.y;
-    moveCircle(e,(tx-e.x)/td*e.speed*movement*slow*dt,(ty-e.y)/td*e.speed*movement*slow*dt);
+    const adminSpeed=adminMode?adminOptions.enemySpeed/100:1;
+    moveCircle(e,(tx-e.x)/td*e.speed*movement*slow*adminSpeed*dt,(ty-e.y)/td*e.speed*movement*slow*adminSpeed*dt);
     e.walk+=Math.hypot(e.x-ox,e.y-oy)*.1;
     if(e.type==='boss'){updateBossAttack(e,dt,d);return;}
     if(e.attackCd>0)return;
@@ -350,7 +355,7 @@
     moveCircle(player,v.x*speed*dt,v.y*speed*dt);const moved=Math.hypot(player.x-ox,player.y-oy);if(moved>.1)player.walk+=moved*.13;else player.walk*=.93;
     cameraToPlayer(dt);state.hpDisplay+=(Math.max(0,player.hp)-state.hpDisplay)*Math.min(1,dt*13);state.hpTrail+=(Math.max(0,player.hp)-state.hpTrail)*Math.min(1,dt*2.5);
     if(input.fire||input.keys.has(keys.fire))playerShoot();
-    if(state.mode==='playing'&&state.spawned<state.toSpawn){state.spawnTimer-=dt;if(state.spawnTimer<=0){spawnEnemy();state.spawned++;state.spawnTimer=state.info.boss&&state.wave===3?2:clamp(.65-state.info.local*.008,.31,.65);}}
+    if(state.mode==='playing'&&state.spawned<state.toSpawn){state.spawnTimer-=dt*(adminMode?adminOptions.spawnRate/100:1);if(state.spawnTimer<=0){spawnEnemy();state.spawned++;state.spawnTimer=state.info.boss&&state.wave===3?2:clamp(.65-state.info.local*.008,.31,.65);}}
     for(const e of [...enemies])updateEnemy(e,dt);
     for(const p of [...bullets])updateProjectile(p,dt,bullets);for(const p of [...enemyBullets])updateProjectile(p,dt,enemyBullets);
     if(state.mode==='playing')updatePerks(dt);
@@ -545,8 +550,15 @@
       box.innerHTML=`<span>${label}<strong>${display}</strong></span><input type="range" min="${min}" max="${max}" value="${value}" aria-label="${label}">`;
       box.querySelector('input').oninput=e=>{const v=Number(e.target.value);save.settings[id]=v;regular.settings[id]=v;admin.settings=regular.settings;box.querySelector('strong').textContent=id==='menuMotion'?(v?'AN':'AUS'):`${v}%`;applySettings();persist();};card.append(box);
     }
-    grid.append(card);$('profileBtn').innerHTML=adminMode?'SPIELER-PROFIL AKTIVIEREN <span>◆</span>':'ADMIN-PROFIL AKTIVIEREN <span>∞</span>';
+    grid.append(card);
   }
+  function renderAdminPanel(){
+    $('adminProfileBtn').innerHTML=adminMode?'SPIELER-PROFIL AKTIVIEREN <span>◆</span>':'ADMIN-PROFIL AKTIVIEREN <span>∞</span>';
+    $('adminInvincible').checked=adminOptions.invincible;$('adminOneHit').checked=adminOptions.oneHit;
+    for(const [id,key] of [['adminEnemySpeed','enemySpeed'],['adminSpawnRate','spawnRate']]){$(id).value=adminOptions[key];$(`${id}Value`).textContent=`${adminOptions[key]}%`;}
+    $('adminStatus').textContent=adminMode?'Admin-Profil aktiv. Die Regler gelten nur für dieses Profil.':'Spieler-Profil aktiv. Die Regler wirken erst nach Aktivierung des Admin-Profils.';
+  }
+  function openAdminPanel(){state.mode='menu';state.panelReturn='menu';renderAdminPanel();showScreen('adminScreen');}
   function openSettings(fromPause=false){state.mode=fromPause?'paused':'menu';state.panelReturn=fromPause?'pauseScreen':'menu';$('settingsActions').classList.toggle('hidden',fromPause);$('backupPanel').classList.toggle('hidden',fromPause);renderSettings();showScreen('settingsScreen');}
   let pendingBackup=null;
   const backupBeforeImportKey='stickman-siege-before-import';
@@ -648,11 +660,17 @@
   function resume(){if(state.mode!=='paused')return;state.mode='playing';state.last=performance.now();state.accumulator=0;showScreen(null);}
   function backFromPanel(){armedBinding=null;if(state.panelReturn==='pauseScreen'){state.mode='paused';showScreen('pauseScreen');}else openMenu();}
   $('playBtn').onclick=()=>startLevel(Math.min(save.unlocked,C.MAX_LEVEL));$('levelsBtn').onclick=openLevels;$('shopBtn').onclick=()=>openShop(false);$('settingsBtn').onclick=()=>openSettings(false);$('tutorialBtn').onclick=()=>startTutorial(false);
+  let lastAdminTap=-Infinity;
+  $('adminTrigger').addEventListener('click',()=>{if(state.screen!=='menu')return;const now=performance.now();if(now-lastAdminTap<420){lastAdminTap=-Infinity;openAdminPanel();}else lastAdminTap=now;});
+  $('adminTrigger').addEventListener('dblclick',e=>e.preventDefault());
+  $('adminProfileBtn').onclick=changeProfile;
+  for(const [id,key] of [['adminInvincible','invincible'],['adminOneHit','oneHit']])$(id).onchange=e=>{adminOptions[key]=e.target.checked;persistAdminOptions();renderAdminPanel();};
+  for(const [id,key] of [['adminEnemySpeed','enemySpeed'],['adminSpawnRate','spawnRate']])$(id).oninput=e=>{adminOptions[key]=Number(e.target.value);$(`${id}Value`).textContent=`${adminOptions[key]}%`;persistAdminOptions();};
   document.querySelectorAll('[data-back="menu"]').forEach(b=>b.onclick=backFromPanel);
   document.querySelectorAll('#shopTabs button').forEach(b=>b.onclick=()=>{state.shopTab=b.dataset.tab;renderShop();});
   document.querySelectorAll('#settingsTabs button').forEach(b=>b.onclick=()=>{state.settingsTab=b.dataset.settingsTab;renderSettings();});
   $('saveExportBtn').onclick=exportSave;$('saveImportBtn').onclick=()=>$('saveFileInput').click();$('saveFileInput').onchange=e=>{selectBackup(e.target.files?.[0]);e.target.value='';};$('saveRestoreBtn').onclick=restoreBackup;$('saveUndoBtn').onclick=undoBackup;refreshUndo();
-  $('profileBtn').onclick=changeProfile;$('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialUpgradeBtn').onclick=()=>{if(state.mode!=='tutorial'||state.tutorialStep!==5)return;player.trainingBonus=true;state.tutorial.upgraded=true;flashEffect('ring',player.x,player.y,'#a4ffdf',.6,{r:90});sfx('power');toast('PROBE-UPGRADE: +12 SCHADEN');};$('tutorialNext').onclick=()=>{if(state.mode!=='tutorialComplete')return;if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();};$('tutorialSkip').onclick=skipTutorial;
+  $('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialUpgradeBtn').onclick=()=>{if(state.mode!=='tutorial'||state.tutorialStep!==5)return;player.trainingBonus=true;state.tutorial.upgraded=true;flashEffect('ring',player.x,player.y,'#a4ffdf',.6,{r:90});sfx('power');toast('PROBE-UPGRADE: +12 SCHADEN');};$('tutorialNext').onclick=()=>{if(state.mode!=='tutorialComplete')return;if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();};$('tutorialSkip').onclick=skipTutorial;
   $('pauseBtn').onclick=pause;$('resumeBtn').onclick=resume;$('restartBtn').onclick=()=>startLevel(state.level);$('settingsFromPause').onclick=()=>openSettings(true);$('shopFromPause').onclick=()=>openShop(true);$('menuFromPause').onclick=openMenu;
   $('resultShop').onclick=()=>openShop(false);$('resultMenu').onclick=openMenu;
   function keyOf(e){return e.key.toLowerCase();}
@@ -679,7 +697,7 @@
   for(const control of [fire,stick]){for(const name of ['touchstart','touchmove','touchend'])control.addEventListener(name,e=>e.preventDefault(),{passive:false});control.addEventListener('dblclick',e=>e.preventDefault());control.addEventListener('contextmenu',e=>e.preventDefault());}
   $('app').addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});$('app').addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.mode==='playing')pause();});
-  if(location.hostname==='localhost'||location.hostname==='127.0.0.1')window.__SIEGE_QA__={snapshot:()=>({mode:state.mode,level:state.level,map:state.info.map.id,tutorialStep:state.tutorialStep,tutorial:state.tutorial?{...state.tutorial}:null,player:player?{x:player.x,y:player.y,hp:player.hp,cooldowns:{...player.cooldowns},buffs:{...player.buffs}}:null,enemies:enemies.map(e=>({type:e.type,hp:e.hp,x:e.x,y:e.y})),pickups:pickups.map(p=>({kind:p.kind,power:p.power,x:p.x,y:p.y})),coins:save.coins,xp:save.xp,xpLevel:save.xpLevel,rewardClaimed:save.tutorialRewardClaimed}),startLevel,startTutorial,spawnEnemy,finish,collectPickup:kind=>{if(!player)return;const p={kind,power:kind==='power'?'rapid':undefined,x:player.x,y:player.y,r:9,value:100,life:10,t:0};pickups.push(p);collectPickup(p);},setPlayer:(x,y)=>{if(player){player.x=x;player.y=y;cameraToPlayer(1);}},step:update};
+  if(location.hostname==='localhost'||location.hostname==='127.0.0.1')window.__SIEGE_QA__={snapshot:()=>({mode:state.mode,level:state.level,map:state.info.map.id,adminMode,adminOptions:{...adminOptions},tutorialStep:state.tutorialStep,tutorial:state.tutorial?{...state.tutorial}:null,player:player?{x:player.x,y:player.y,hp:player.hp,cooldowns:{...player.cooldowns},buffs:{...player.buffs}}:null,enemies:enemies.map(e=>({type:e.type,hp:e.hp,x:e.x,y:e.y})),pickups:pickups.map(p=>({kind:p.kind,power:p.power,x:p.x,y:p.y})),coins:save.coins,xp:save.xp,xpLevel:save.xpLevel,rewardClaimed:save.tutorialRewardClaimed}),startLevel,startTutorial,spawnEnemy,finish,damageFirstEnemy:amount=>{if(enemies[0])damageEnemy(enemies[0],amount);},hurtPlayer:hurt,collectPickup:kind=>{if(!player)return;const p={kind,power:kind==='power'?'rapid':undefined,x:player.x,y:player.y,r:9,value:100,life:10,t:0};pickups.push(p);collectPickup(p);},setPlayer:(x,y)=>{if(player){player.x=x;player.y=y;cameraToPlayer(1);}},step:update};
   applySettings();renderMenu();showScreen('menu');
   if((location.hostname==='localhost'||location.hostname==='127.0.0.1')&&new URLSearchParams(location.search).has('qaBoss')){
     const args=new URLSearchParams(location.search),mapIndex=C.MAPS.findIndex(m=>m.id===args.get('qaBoss'));

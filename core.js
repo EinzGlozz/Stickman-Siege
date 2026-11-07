@@ -119,6 +119,10 @@
     s.weapons=['pistol','rifle','bow'];s.perks=['arrows','orb'];s.tutorialDone=true;s.tutorialRewardClaimed=true;
     return s;
   }
+  function sanitizeAdminOptions(raw){
+    const s=raw&&typeof raw==='object'?raw:{};
+    return {invincible:!!s.invincible,oneHit:!!s.oneHit,enemySpeed:finiteInt(s.enemySpeed,100,50,150),spawnRate:finiteInt(s.spawnRate,100,50,200)};
+  }
   function completeTutorial(save,adminMode=false){
     const awarded=!adminMode&&!save.tutorialRewardClaimed?TUTORIAL_REWARD:0;
     save.tutorialDone=true;save.tutorialSkipped=false;save.tutorialRewardClaimed=true;
@@ -133,5 +137,5 @@
     if(!s||typeof s!=='object'||!Number.isFinite(s.coins)||!Number.isFinite(s.unlocked)||!s.upgrades||typeof s.upgrades!=='object'||!Array.isArray(s.ownedWeapons)||!Array.isArray(s.ownedSkins)||!s.settings||typeof s.settings!=='object')throw new Error('Die Sicherungsdatei ist unvollständig oder beschädigt.');
     return sanitizeSave(s);
   }
-  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,TUTORIAL_REWARD,BACKUP_FORMAT,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave,completeTutorial,createBackup,readBackup};
+  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,TUTORIAL_REWARD,BACKUP_FORMAT,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave,sanitizeAdminOptions,completeTutorial,createBackup,readBackup};
 });
