@@ -1,4 +1,4 @@
-# Stickman Siege · Version 3
+# Stickman Siege · Version 4
 
 Ein 2D-Stickman-Shooter für Handy und Computer. Du kämpfst gegen Zombies, Skelette, Ghule, Golems, Geister und Dämonen, sammelst Münzen, XP und animierte Powerups, kaufst Upgrades und besiegst Kartenbosse.
 
@@ -6,20 +6,23 @@ Ein 2D-Stickman-Shooter für Handy und Computer. Du kämpfst gegen Zombies, Skel
 
 **Spiel-Link:** [Stickman Siege öffnen](https://stickman-siege-2d-20261106.bestcurry2.chatgpt.site/)
 
+**Nur Querformat:** Halte das Handy quer. Im Hochformat zeigt das Spiel einen Drehhinweis und hält den laufenden Kampf an. Die installierte Web-App fordert auf unterstützten Geräten Querformat an.
+
 Diese ChatGPT-Site ist derzeit für den Besitzerzugang freigegeben. Öffne den Link auf dem Handy im Browser und melde dich bei Bedarf mit demselben ChatGPT-Konto an.
 
 | Gerät | Installation |
 | --- | --- |
 | **Android** | Den Spiel-Link in **Chrome** öffnen → Menü **⋮** → **App installieren** oder **Zum Startbildschirm hinzufügen**. |
 | **iPhone / iPad** | Den Spiel-Link in **Safari** öffnen → **Teilen** → **Zum Home-Bildschirm** → **Hinzufügen**. |
-| **PC / Mac** | [Offline-Paket als ZIP herunterladen](https://github.com/EinzGlozz/Stickman-Siege/raw/refs/heads/main/downloads/Stickman-Siege-PC-v3.zip), entpacken und `index.html` öffnen. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
+| **PC / Mac** | [Offline-Paket als ZIP herunterladen](https://github.com/EinzGlozz/Stickman-Siege/raw/refs/heads/main/downloads/Stickman-Siege-PC-v4.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
 
 Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dieser Version keine signierte APK- oder IPA-Datei. Für eine eigenständige Store-App wären Android-Buildwerkzeuge beziehungsweise ein Apple-Entwicklerkonto und Code-Signierung nötig. Das PC-ZIP enthält die Spieldateien für die Offline-Nutzung.
 
-## Das steckt in Version 3
+## Das steckt in Version 4
 
 - **6 Karten mit je 30 Levels:** Grasland, Wüste, Friedhof, Vulkaninsel, Frostfestung und Neonruinen. Level 30 jeder Karte enthält einen Boss und schaltet die nächste Karte frei.
-- **Monster mit eigenen Angriffen:** Zombies und Ghule greifen im Nahkampf an, Skelette schießen Pfeile, weitere Monster und Bosse verwenden eigene Muster.
+- **Monster mit eigenen Angriffen:** Zombies und Ghule greifen im Nahkampf an, Skelette schießen Pfeile. Jeder Kartenboss besitzt eine eigene normale und eine eigene Superattacke: Dornen/Wurzeln, Sandlanzen/Sandsturm, Geister/Grabruf, Lavakugel/Eruption, Eissplitter/Frostnova oder Energiestrahl/Kreuzblitz. Die Angriffe werden vor dem Treffer sichtbar angekündigt.
+- **Schwierigere Wellen:** Mehr Gegner pro Welle, etwas stärkere Gegner in späteren Wellen und längere normale Schusspausen. Das Powerup Dauerfeuer bleibt deutlich schneller.
 - **Beute und Entwicklung:** Jeder besiegte Gegner lässt Münzen und XP fallen. Dazu kommen zufällige Powerups wie 4 Sekunden Dauerfeuer, Unsterblichkeit, Doppelschaden, Super-Magnet und Zeitlupe.
 - **Ausrüstung:** Acht teurer werdende Upgrades, sechs Waffen, drei gleichzeitig ausrüstbare Waffen und zwei automatische Perks wie Pfeile, Ziegel oder Fußbälle.
 - **Skins:** Spider-Man, Batman, Wolverine, Hulk, Iron Man, Thor und Schattenninja kosten Münzen und besitzen eigene Spezialattacken und Animationen. Die Figuren sind Fan-Inhalte; es besteht keine Verbindung zu den Rechteinhabern.
