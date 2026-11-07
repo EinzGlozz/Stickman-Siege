@@ -125,5 +125,13 @@
     save.coins=clamp(save.coins+awarded,0,999999999);
     return awarded;
   }
-  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,TUTORIAL_REWARD,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave,completeTutorial};
+  const BACKUP_FORMAT='stickman-siege-save';
+  function createBackup(save){return {format:BACKUP_FORMAT,version:1,save:sanitizeSave(save)};}
+  function readBackup(data){
+    if(!data||typeof data!=='object'||data.format!==BACKUP_FORMAT||data.version!==1)throw new Error('Das ist keine unterstützte Stickman-Siege-Sicherung.');
+    const s=data.save;
+    if(!s||typeof s!=='object'||!Number.isFinite(s.coins)||!Number.isFinite(s.unlocked)||!s.upgrades||typeof s.upgrades!=='object'||!Array.isArray(s.ownedWeapons)||!Array.isArray(s.ownedSkins)||!s.settings||typeof s.settings!=='object')throw new Error('Die Sicherungsdatei ist unvollständig oder beschädigt.');
+    return sanitizeSave(s);
+  }
+  return {LEVELS_PER_MAP,MAPS,MAX_LEVEL,TUTORIAL_REWARD,BACKUP_FORMAT,UPGRADES,WEAPONS,PERKS,SKINS,POWERUPS,BOSS_PATTERNS,clamp,normalize,levelInfo,xpRequired,upgradeCost,pointCost,weaponInterval,waveSize,defaultSave,sanitizeSave,adminSave,completeTutorial,createBackup,readBackup};
 });

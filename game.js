@@ -547,7 +547,49 @@
     }
     grid.append(card);$('profileBtn').innerHTML=adminMode?'SPIELER-PROFIL AKTIVIEREN <span>◆</span>':'ADMIN-PROFIL AKTIVIEREN <span>∞</span>';
   }
-  function openSettings(fromPause=false){state.mode=fromPause?'paused':'menu';state.panelReturn=fromPause?'pauseScreen':'menu';$('settingsActions').classList.toggle('hidden',fromPause);renderSettings();showScreen('settingsScreen');}
+  function openSettings(fromPause=false){state.mode=fromPause?'paused':'menu';state.panelReturn=fromPause?'pauseScreen':'menu';$('settingsActions').classList.toggle('hidden',fromPause);$('backupPanel').classList.toggle('hidden',fromPause);renderSettings();showScreen('settingsScreen');}
+  let pendingBackup=null;
+  const backupBeforeImportKey='stickman-siege-before-import';
+  function backupStatus(message){$('saveStatus').textContent=message;}
+  function refreshUndo(){try{$('saveUndoBtn').classList.toggle('hidden',!localStorage.getItem(backupBeforeImportKey));}catch{$('saveUndoBtn').classList.add('hidden');}}
+  function exportSave(){
+    try{
+      const backup={...C.createBackup(regular),exportedAt:new Date().toISOString()};
+      const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));
+      const link=document.createElement('a');link.href=url;link.download=`Stickman-Siege-Spielstand-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+      backupStatus('Sicherung des normalen Profils heruntergeladen. Bewahre die Datei sicher auf.');
+    }catch{backupStatus('Die Sicherung konnte nicht heruntergeladen werden.');}
+  }
+  async function selectBackup(file){
+    pendingBackup=null;$('saveRestoreBtn').classList.add('hidden');$('savePreview').classList.add('hidden');
+    if(!file)return;
+    if(file.size>1024*1024){backupStatus('Die Datei ist zu groß (maximal 1 MB).');return;}
+    try{
+      pendingBackup=C.readBackup(JSON.parse(await file.text()));
+      const info=C.levelInfo(pendingBackup.unlocked),skin=C.SKINS.find(x=>x.id===pendingBackup.skin);
+      $('savePreview').textContent=`Vorschau: ${pendingBackup.coins} Münzen · ${info.map.name}, Level ${info.local} · ${pendingBackup.ownedSkins.length} Skins · aktiv: ${skin.name}. Dein aktueller normaler Spielstand wird erst beim Bestätigen ersetzt.`;
+      $('savePreview').classList.remove('hidden');$('saveRestoreBtn').classList.remove('hidden');
+      backupStatus('Sicherung geprüft. Bestätige die Wiederherstellung, wenn diese Daten richtig sind.');
+    }catch(error){backupStatus(error.message||'Die Sicherung konnte nicht gelesen werden.');}
+  }
+  function applyRegularSave(next){regular=next;admin.settings=regular.settings;save=adminMode?admin:regular;applySettings();renderSettings();renderMenu();pendingBackup=null;$('saveRestoreBtn').classList.add('hidden');$('savePreview').classList.add('hidden');refreshUndo();}
+  function restoreBackup(){
+    if(!pendingBackup)return;
+    try{
+      localStorage.setItem(backupBeforeImportKey,JSON.stringify(regular));
+      localStorage.setItem('stickman-siege-v3',JSON.stringify(pendingBackup));
+      applyRegularSave(pendingBackup);backupStatus('Spielstand wiederhergestellt. Der vorherige Stand kann hier zurückgeholt werden.');
+    }catch{backupStatus('Speichern ist in diesem Browser nicht möglich. Dein bisheriger Stand bleibt aktiv.');}
+  }
+  function undoBackup(){
+    try{
+      const previous=JSON.parse(localStorage.getItem(backupBeforeImportKey)||'null');
+      if(!previous)throw new Error('Kein vorheriger Spielstand gefunden.');
+      const restored=C.sanitizeSave(previous);localStorage.setItem('stickman-siege-v3',JSON.stringify(restored));localStorage.removeItem(backupBeforeImportKey);
+      applyRegularSave(restored);backupStatus('Der vorherige Spielstand wurde zurückgeholt.');
+    }catch(error){backupStatus(error.message||'Der vorherige Stand konnte nicht zurückgeholt werden.');}
+  }
   const tutorialSteps=[
     {icon:'➤',title:'BEWEGEN',body:'Handy: linker Stick. PC: WASD oder Pfeiltasten. Gehe ein Stück über das Trainingsfeld.',goal:'Lege 110 Schritte zurück'},
     {icon:'◎',title:'SCHIESSEN',body:'Halte FEUER gedrückt oder nutze die Leertaste. Schüsse haben eine kurze Pause. Besiege die Zielpuppe.',goal:'Zielpuppe besiegen'},
@@ -609,6 +651,7 @@
   document.querySelectorAll('[data-back="menu"]').forEach(b=>b.onclick=backFromPanel);
   document.querySelectorAll('#shopTabs button').forEach(b=>b.onclick=()=>{state.shopTab=b.dataset.tab;renderShop();});
   document.querySelectorAll('#settingsTabs button').forEach(b=>b.onclick=()=>{state.settingsTab=b.dataset.settingsTab;renderSettings();});
+  $('saveExportBtn').onclick=exportSave;$('saveImportBtn').onclick=()=>$('saveFileInput').click();$('saveFileInput').onchange=e=>{selectBackup(e.target.files?.[0]);e.target.value='';};$('saveRestoreBtn').onclick=restoreBackup;$('saveUndoBtn').onclick=undoBackup;refreshUndo();
   $('profileBtn').onclick=changeProfile;$('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialUpgradeBtn').onclick=()=>{if(state.mode!=='tutorial'||state.tutorialStep!==5)return;player.trainingBonus=true;state.tutorial.upgraded=true;flashEffect('ring',player.x,player.y,'#a4ffdf',.6,{r:90});sfx('power');toast('PROBE-UPGRADE: +12 SCHADEN');};$('tutorialNext').onclick=()=>{if(state.mode!=='tutorialComplete')return;if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();};$('tutorialSkip').onclick=skipTutorial;
   $('pauseBtn').onclick=pause;$('resumeBtn').onclick=resume;$('restartBtn').onclick=()=>startLevel(state.level);$('settingsFromPause').onclick=()=>openSettings(true);$('shopFromPause').onclick=()=>openShop(true);$('menuFromPause').onclick=openMenu;
   $('resultShop').onclick=()=>openShop(false);$('resultMenu').onclick=openMenu;

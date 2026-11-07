@@ -71,6 +71,14 @@
 .key-row button{min-width:100px;border:1px solid #4a7280;background:#173b4b;color:#8ef3ec;padding:7px 8px;font-size:10px;font-weight:900;cursor:pointer}
 .settings-actions{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
 .settings-actions .secondary-button{min-width:230px}
+.backup-panel{margin:22px 0;padding:20px;border:1px solid #365a6a;background:#0d2232}
+.backup-panel h3{margin:0 0 7px;font-family:'Barlow Condensed',Impact,sans-serif;font-size:28px;letter-spacing:.04em}
+.backup-panel p{color:#a9c5ce;font-size:13px;line-height:1.45;margin:0 0 15px}
+.backup-actions{display:flex;gap:10px;flex-wrap:wrap}
+.backup-actions .secondary-button{flex:1 1 220px}
+.backup-panel>.primary-button,.backup-panel>.secondary-button{width:100%;margin-top:10px}
+.save-preview{margin:14px 0 4px;padding:13px 15px;border-left:3px solid #61e7dc;background:#163842;color:#e5f8f9;font-size:13px;line-height:1.5}
+.backup-panel .backup-status{min-height:18px;margin:12px 0 0;color:#80d9d5}
 .tutorial-modal{max-width:510px;text-align:center}
 .tutorial-symbol{width:90px;height:90px;margin:25px auto 18px;display:grid;place-items:center;border:2px solid #6cece4;border-radius:50%;background:#1b4d57;color:#b6fff6;font-size:46px;box-shadow:0 0 35px #55e7df37;animation:tutorial-pulse 2s ease-in-out infinite}
 .tutorial-modal h2{font-size:clamp(45px,7vw,72px);margin:15px 0 20px}
