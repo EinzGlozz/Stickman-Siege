@@ -1,4 +1,13 @@
-# QA-Feedback · Version 10
+# QA-Feedback · Version 11
+
+Version 11 behebt das Hängenbleiben der Handy-Bewegung bei verlorener Pointer-Erfassung und sichert die Spielfeldmaße nach Größenwechseln ab. Die Kisten sind jetzt quadratisch. Im lokalen Browser waren Spielfeld, Figur und Tutorial bei 667 × 300 Pixeln sichtbar; die Canvas-CSS-Größe und der Zeichenpuffer betrugen jeweils 667 × 300 Pixel.
+
+## Tests für Version 11
+
+- `node --test tests/*.test.js`: 19 von 19 bestanden. Neu: Resize bei 667 × 300 und 568 × 320 Pixeln mit 2× Pixeldichte, Joystick-Verlust der Fingererfassung, Totbereich und Pause/Fortsetzen.
+- Ein echter Finger-Test auf iOS und Android steht noch aus; die gemeldete Verzerrung ließ sich in der Browser-Vorschau nicht direkt reproduzieren. Die Größenabgleichung und Eingabe-Rücksetzung decken die erkannten Fehlermöglichkeiten ab.
+
+## Vorherige Prüfung
 
 Version 10 wurde im lokalen Browser bei 568 × 320 Pixeln geprüft. Startmenü und Tutorial blieben trotz der neuen Lichtakzente lesbar; der Grafikregler „Menü-Effekte“ deaktivierte die CSS-Animationen und ließ sie danach wieder zu. Die Browser-Konsole zeigte keine JavaScript-Fehler. Die Kartenlichter hängen am vorhandenen Partikelregler und werden bei reduzierter Bewegung ausgelassen.
 

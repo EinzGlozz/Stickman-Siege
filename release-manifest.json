@@ -40,6 +40,10 @@
     {
       "version": 10,
       "asset": "downloads/Stickman-Siege-PC-v10.zip"
+    },
+    {
+      "version": 11,
+      "asset": "downloads/Stickman-Siege-PC-v11.zip"
     }
   ]
 }

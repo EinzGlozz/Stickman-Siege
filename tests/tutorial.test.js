@@ -9,23 +9,29 @@ function gameHarness() {
   const elements = new Map();
   const listeners = new Map();
   const storage = new Map();
+  const observers=[];
+  let viewport={width:844,height:390};
   function el(id) {
-    if (!elements.has(id)) elements.set(id, {
+    if (!elements.has(id)) {const eventHandlers=new Map();elements.set(id, {
       id, textContent:'', innerHTML:'', firstElementChild:{textContent:''},
       classList:{add(){},remove(){},toggle(){},contains(){return false;}},
       style:{setProperty(){}},
-      addEventListener(){}, setPointerCapture(){},
-      getBoundingClientRect(){return {left:0,top:0,width:844,height:390};}
-    });
+      addEventListener(name,handler){eventHandlers.set(name,handler);},
+      emit(name,event){eventHandlers.get(name)?.(event);},
+      setPointerCapture(){},
+      getBoundingClientRect(){return {left:0,top:0,...viewport};}
+    });}
     return elements.get(id);
   }
-  el('game').getContext = () => ({setTransform(){}});
+  let transform=[];
+  el('game').getContext = () => ({setTransform(...args){transform=args;}});
   const context = {
     SiegeCore:C, innerWidth:844, innerHeight:390, devicePixelRatio:1,
     document:{getElementById:el,querySelectorAll:()=>[],addEventListener(){},hidden:false},
     localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)},
     location:{hostname:'localhost',search:''}, screen:{orientation:{lock:()=>Promise.resolve()}},
     performance:{now:()=>0}, requestAnimationFrame(){}, setTimeout(){},
+    ResizeObserver:class{constructor(handler){observers.push(handler);}observe(){}},
     addEventListener:(name,handler)=>listeners.set(name,handler),
     URLSearchParams, Math, console
   };
@@ -33,7 +39,8 @@ function gameHarness() {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../dist/game.js'),'utf8'),context);
   const qa=context.__SIEGE_QA__;
   function key(name,down){listeners.get(down?'keydown':'keyup')({key:name,preventDefault(){}});}
-  return {qa,key,el,storage};
+  function resizeTo(width,height,dpr=1){viewport={width,height};context.innerWidth=width;context.innerHeight=height;context.devicePixelRatio=dpr;for(const notify of observers)notify();}
+  return {qa,key,el,storage,resizeTo,transform:()=>transform};
 }
 
 function finishTraining(h) {
@@ -114,4 +121,46 @@ test('all maps start in a clear visible area and tutorial leaves room for guidan
   const {player,view}=h.qa.snapshot();
   assert.equal(view.spawnClear,true);
   assert.ok(Math.abs(player.y-view.cameraY-view.height*.38)<1);
+});
+
+test('the canvas tracks short landscape resizes without stretching game coordinates',()=>{
+  const h=gameHarness();
+  h.resizeTo(667,300,2);
+  assert.equal(h.el('game').width,1334);
+  assert.equal(h.el('game').height,600);
+  assert.deepEqual(h.transform(),[2,0,0,2,0,0]);
+  h.qa.startTutorial(false);
+  let {player,view}=h.qa.snapshot();
+  assert.ok(Math.abs(player.y-view.cameraY-view.height*.32)<1);
+  h.resizeTo(568,320,2);
+  assert.equal(h.el('game').width,1136);
+  assert.equal(h.el('game').height,640);
+  assert.deepEqual(h.transform(),[2,0,0,2,0,0]);
+});
+
+test('mobile movement stops when pointer capture is lost and after pausing',()=>{
+  const h=gameHarness();
+  h.el('adminProfileBtn').onclick();
+  h.qa.startLevel(1);
+  const stick=h.el('joystick');
+  stick.getBoundingClientRect=()=>({left:0,top:0,width:100,height:100});
+  const start=h.qa.snapshot().player.x;
+  stick.emit('pointerdown',{pointerId:3,clientX:80,clientY:50,preventDefault(){}});
+  h.qa.step(.1);
+  const moved=h.qa.snapshot().player.x;
+  assert.ok(moved>start);
+  stick.emit('lostpointercapture',{pointerId:3});
+  h.qa.step(.1);
+  assert.equal(h.qa.snapshot().player.x,moved);
+  stick.emit('pointerdown',{pointerId:4,clientX:53,clientY:50,preventDefault(){}});
+  h.qa.step(.1);
+  assert.equal(h.qa.snapshot().player.x,moved);
+  stick.emit('pointermove',{pointerId:4,clientX:80,clientY:50});
+  h.qa.step(.1);
+  assert.ok(h.qa.snapshot().player.x>moved);
+  h.el('pauseBtn').onclick();
+  const paused=h.qa.snapshot().player.x;
+  h.el('resumeBtn').onclick();
+  h.qa.step(.1);
+  assert.equal(h.qa.snapshot().player.x,paused);
 });

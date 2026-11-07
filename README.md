@@ -1,4 +1,4 @@
-# Stickman Siege · Version 10
+# Stickman Siege · Version 11
 
 Ein 2D-Stickman-Shooter für Handy und Computer. Du kämpfst gegen Zombies, Skelette, Ghule, Golems, Geister und Dämonen, sammelst Münzen, XP und animierte Powerups, kaufst Upgrades und besiegst Kartenbosse.
 
@@ -14,11 +14,16 @@ Diese ChatGPT-Site ist derzeit für den Besitzerzugang freigegeben. Öffne den L
 | --- | --- |
 | **Android** | Den Spiel-Link in **Chrome** öffnen → Menü **⋮** → **App installieren** oder **Zum Startbildschirm hinzufügen**. |
 | **iPhone / iPad** | Den Spiel-Link in **Safari** öffnen → **Teilen** → **Zum Home-Bildschirm** → **Hinzufügen**. |
-| **PC / Mac** | [Offline-Paket als ZIP herunterladen](downloads/Stickman-Siege-PC-v10.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
+| **PC / Mac** | [Offline-Paket als ZIP herunterladen](downloads/Stickman-Siege-PC-v11.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
 
 Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dieser Version keine signierte APK- oder IPA-Datei. Für eine eigenständige Store-App wären Android-Buildwerkzeuge beziehungsweise ein Apple-Entwicklerkonto und Code-Signierung nötig. Das PC-ZIP enthält die Spieldateien für die Offline-Nutzung.
 
-## Neu in Version 10
+## Neu in Version 11
+
+- **Proportionales Spielfeld:** Die Zeichenfläche übernimmt nach Größen- und Orientierungsänderungen sofort die tatsächliche Breite und Höhe. Kisten sind quadratisch; die Figur bleibt auf kurzen Querformat-Bildschirmen oberhalb der Tutorialkarte sichtbar.
+- **Joystick löst zuverlässig:** Verliert das Handy die Fingererfassung, wird der Stick sofort neutral. Dasselbe gilt beim Pausieren, beim Wechsel in ein Menü und wenn die App in den Hintergrund geht. Ein kleiner Totbereich verhindert unbeabsichtigtes Loslaufen durch Berührungen nahe der Mitte.
+
+## Seit Version 10 enthalten
 
 - **Lebendigere Karten:** Kleine, kartenfarbene Lichtpunkte und ein sanft pulsierender Ring am Startbereich beleben die Arena. Der Partikelregler steuert ihre Stärke; bei 0 % oder aktivierter Option für reduzierte Bewegung bleiben sie aus.
 - **Leuchtende Menüs und Buttons:** Langsam wandernde Hintergrundakzente, sanfte Lichtläufe auf Schaltflächen und ein pulsierender Feuerknopf. „Menü-Effekte“ im Grafik-Reiter schaltet die Menüanimationen aus; reduzierte Bewegung wird berücksichtigt.
