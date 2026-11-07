@@ -92,3 +92,23 @@
 .orientation-gate{display:none;position:absolute;z-index:20;inset:0;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at center,#173e48,#06111e 70%);color:#e9fcfc;text-align:center}
 .orientation-card{max-width:360px}.orientation-icon{font-size:72px;line-height:1;color:#64e9e2;animation:tutorial-pulse 2s ease-in-out infinite}.orientation-icon span{font-size:42px;color:#f8bc83}.orientation-card strong{display:block;margin-top:16px;font:900 35px/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:.05em}.orientation-card p{color:#b7d1d8;font-size:14px;line-height:1.5}
 @media(orientation:portrait){.orientation-gate{display:flex}}
+
+/* Calm menu idle motion and four focused settings tabs. */
+.menu-figure svg{transform-origin:50% 75%;animation:menu-breathe 4.6s ease-in-out infinite}
+.menu-back-arm{transform-origin:142px 138px;animation:menu-back-arm 4.6s ease-in-out infinite}
+.menu-front-arm,.menu-weapon{transform-origin:142px 138px;animation:menu-front-arm 4.6s ease-in-out infinite}
+.menu-back-leg{transform-origin:142px 223px;animation:menu-back-leg 4.6s ease-in-out infinite}
+.menu-front-leg{transform-origin:142px 223px;animation:menu-front-leg 4.6s ease-in-out infinite}
+@keyframes menu-breathe{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(.45deg)}}
+@keyframes menu-back-arm{0%,100%{transform:rotate(0)}50%{transform:rotate(-2deg)}}
+@keyframes menu-front-arm{0%,100%{transform:rotate(0)}50%{transform:rotate(1.8deg)}}
+@keyframes menu-back-leg{0%,100%{transform:rotate(0)}50%{transform:rotate(1.1deg)}}
+@keyframes menu-front-leg{0%,100%{transform:rotate(0)}50%{transform:rotate(-1.1deg)}}
+#app.motion-off .menu-figure svg,#app.motion-off .menu-stickman path,#app.motion-off .menu-weapon{animation:none!important}
+@media(prefers-reduced-motion:reduce){.menu-figure svg,.menu-stickman path,.menu-weapon{animation:none!important}}
+.settings-panel .panel-header{margin-bottom:25px}.settings-panel h2{margin-bottom:24px}
+.settings-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:7px;margin-bottom:16px;scrollbar-width:thin}
+.settings-tabs button{flex:1 0 132px;min-height:42px;border:1px solid #426575;background:#10293a;color:#b6d0d7;padding:8px 10px;font-size:10px;font-weight:900;letter-spacing:.06em;white-space:nowrap}
+.settings-tabs button.selected{border-color:#5de8de;background:#1a4a51;color:#dcfffa;box-shadow:inset 0 -3px #62e8dd}
+.settings-grid{display:block}.settings-grid .settings-card{max-width:640px;min-height:185px}.settings-card .setting-slider{max-width:520px}
+@media(max-height:590px){.settings-panel .panel-header{margin-bottom:14px}.settings-panel h2{font-size:clamp(47px,6vw,70px);margin-bottom:13px}.settings-tabs{margin-bottom:10px}.settings-tabs button{min-height:36px}.settings-grid .settings-card{min-height:0;padding:14px 18px}.settings-card h3{font-size:24px;margin-bottom:9px}.settings-card p{margin-bottom:9px}.setting-slider{margin:9px 0}.settings-actions{margin:12px 0}}

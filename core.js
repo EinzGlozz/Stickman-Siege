@@ -87,7 +87,7 @@
     return {coins:0,unlocked:1,best:0,xp:0,xpLevel:1,skillPoints:0,
       upgrades:Object.fromEntries(UPGRADES.map(u=>[u.id,0])),
       ownedSkins:['soldier'],skin:'soldier',ownedWeapons:['pistol'],weapons:['pistol'],ownedPerks:[],perks:[],tutorialDone:false,tutorialSkipped:false,tutorialRewardClaimed:false,
-      settings:{master:70,music:38,sfx:75,joyX:6,joyY:7,fireX:6,fireY:8,keys:{up:'w',down:'s',left:'a',right:'d',fire:' ',pause:'p'}}};
+      settings:{master:70,music:38,sfx:75,particles:75,shake:65,menuMotion:1,joyX:6,joyY:7,fireX:6,fireY:8,keys:{up:'w',down:'s',left:'a',right:'d',fire:' ',pause:'p'}}};
   }
   function sanitizeSave(raw){
     const d=defaultSave(),s=raw&&typeof raw==='object'?raw:{};
@@ -107,6 +107,7 @@
       ownedPerks,perks:validIds(s.perks,PERKS).filter(id=>ownedPerks.includes(id)).slice(0,2),
       tutorialDone:!!s.tutorialDone,tutorialSkipped:!!s.tutorialSkipped,tutorialRewardClaimed:!!s.tutorialRewardClaimed,
       settings:{master:finiteInt(settings.master,d.settings.master,0,100),music:finiteInt(settings.music,d.settings.music,0,100),sfx:finiteInt(settings.sfx,d.settings.sfx,0,100),
+        particles:finiteInt(settings.particles,d.settings.particles,0,100),shake:finiteInt(settings.shake,d.settings.shake,0,100),menuMotion:finiteInt(settings.menuMotion,d.settings.menuMotion,0,1),
         joyX:finiteInt(settings.joyX,d.settings.joyX,1,36),joyY:finiteInt(settings.joyY,d.settings.joyY,1,36),
         fireX:finiteInt(settings.fireX,d.settings.fireX,1,36),fireY:finiteInt(settings.fireY,d.settings.fireY,1,36),keys}
     };

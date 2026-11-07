@@ -13,7 +13,7 @@
   let save=adminMode?admin:regular;
   function persist(){if(adminMode)return;try{localStorage.setItem('stickman-siege-v3',JSON.stringify(regular));}catch{}}
   function changeProfile(){adminMode=!adminMode;save=adminMode?admin:regular;try{localStorage.setItem('stickman-siege-profile',adminMode?'admin':'player');}catch{}renderSettings();renderMenu();toast(adminMode?'ADMIN-PROFIL AKTIV':'SPIELER-PROFIL AKTIV');}
-  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
+  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',settingsTab:'sound',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
   const trainingMap={...C.MAPS[0],name:'TRAININGSGELÄNDE',subtitle:'Dein erster Einsatz',ground:'#173d43',tile:'#29545a',line:'#8fe9dd55',accent:'#79f2e3',cover:'#3b7374',edge:'#a0dcd1',boss:'ÜBUNGSWÄCHTER'};
   const world={viewW:0,viewH:0,dpr:1,mapW:2200,mapH:2200,cameraX:0,cameraY:0,obstacles:[],decor:[]};
   let player=null,enemies=[],bullets=[],enemyBullets=[],particles=[],pickups=[],effects=[],nextEnemyId=1;
@@ -33,33 +33,37 @@
     demon:{hp:75,speed:82,r:19,damage:17,coin:28,xp:24,reach:0,attack:1.45,color:'#e98077',ranged:true},
     boss:{hp:660,speed:56,r:42,damage:25,coin:450,xp:280,reach:66,attack:1.3,color:'#ffb47d',ranged:true}
   };
-  const audio={ctx:null};
-  function activateAudio(){try{audio.ctx??=new (window.AudioContext||window.webkitAudioContext)();if(audio.ctx.state==='suspended')audio.ctx.resume();}catch{}}
+  const audio={ctx:null,limiter:null};
+  function activateAudio(){try{if(!audio.ctx){audio.ctx=new (window.AudioContext||window.webkitAudioContext)();audio.limiter=audio.ctx.createDynamicsCompressor();audio.limiter.threshold.value=-20;audio.limiter.knee.value=22;audio.limiter.ratio.value=5;audio.limiter.attack.value=.008;audio.limiter.release.value=.18;audio.limiter.connect(audio.ctx.destination);}if(audio.ctx.state==='suspended')audio.ctx.resume();}catch{}}
   function tone(freq,duration=.1,wave='sine',gain=.2,music=false){
     const a=audio.ctx;if(!a||!freq)return;
     const volume=(save.settings.master/100)*(music?save.settings.music/100:save.settings.sfx/100);
     if(volume<=0)return;
     const oscillator=a.createOscillator(),node=a.createGain(),now=a.currentTime;
     oscillator.type=wave;oscillator.frequency.setValueAtTime(freq,now);
-    node.gain.setValueAtTime(Math.max(.0001,gain*volume),now);node.gain.exponentialRampToValueAtTime(.0001,now+duration);
-    oscillator.connect(node);node.connect(a.destination);oscillator.start(now);oscillator.stop(now+duration+.01);
+    const peak=Math.max(.0001,Math.min(.14,gain*volume));node.gain.setValueAtTime(.0001,now);node.gain.linearRampToValueAtTime(peak,now+.006);node.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    oscillator.connect(node);node.connect(audio.limiter||a.destination);oscillator.start(now);oscillator.stop(now+duration+.01);
   }
   function sfx(kind){
-    if(kind==='shot')tone(320,.07,'triangle',.1);
-    else if(kind==='hit')tone(130,.12,'sawtooth',.1);
-    else if(kind==='coin')tone(760,.1,'sine',.14);
-    else if(kind==='xp')tone(570,.08,'sine',.09);
-    else if(kind==='power'){tone(440,.17,'sine',.15);setTimeout(()=>tone(660,.2,'sine',.12),75);}
-    else if(kind==='hurt')tone(85,.2,'sawtooth',.16);
+    if(kind==='shot')tone(340,.06,'triangle',.045);
+    else if(kind==='hit')tone(155,.085,'triangle',.048);
+    else if(kind==='coin')tone(780,.085,'sine',.075);
+    else if(kind==='xp')tone(610,.07,'sine',.055);
+    else if(kind==='power'){tone(460,.13,'sine',.08);setTimeout(()=>tone(690,.16,'sine',.07),80);}
+    else if(kind==='hurt')tone(105,.16,'triangle',.09);
   }
   function updateMusic(dt){
     if(!['playing','tutorial'].includes(state.mode)||!audio.ctx)return;
     state.musicTimer-=dt;if(state.musicTimer>0)return;
-    const boss=state.info.boss&&state.wave===3;
-    const notes=boss?[110,165,130,196,146,220,130,165]:[196,247,294,247,220,261,330,261];
-    const n=notes[state.musicNote++%notes.length];tone(n,boss?.21:.48,boss?'sawtooth':'sine',boss?.038:.042,true);
-    if(state.musicNote%4===1)tone(n/2,boss?.35:.7,'triangle',.025,true);
-    state.musicTimer=boss?.27:.57;
+    const boss=state.info.boss&&state.wave===3,step=state.musicNote++%16;
+    const melody=boss?[220,0,261,294,0,330,294,0,349,0,330,294,261,0,220,196]:[294,0,330,392,0,330,294,0,349,0,392,440,392,0,330,294];
+    const bass=boss?[110,110,130,130,146,146,130,130,110,110,146,146,130,130,98,98]:[147,147,165,165,175,175,165,165,147,147,175,175,165,165,131,131];
+    if(melody[step])tone(melody[step],boss?.15:.18,boss?'triangle':'sine',boss?.048:.045,true);
+    if(step%2===0)tone(bass[step],.16,'triangle',.032,true);
+    if(step%4===0)tone(72,.09,'sine',.045,true);
+    if(step%4===2)tone(180,.065,'triangle',.02,true);
+    if(step%2===1)tone(1250,.028,'triangle',.012,true);
+    state.musicTimer=boss?.19:.24;
   }
   function makeRng(seed){let v=seed>>>0;return()=>{v+=0x6d2b79f5;let t=v;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
   function circleRect(x,y,r,o){const px=clamp(x,o.x,o.x+o.w),py=clamp(y,o.y,o.y+o.h);return(x-px)**2+(y-py)**2<r*r;}
@@ -121,7 +125,7 @@
   function cameraToPlayer(dt=1){if(!player)return;const x=clamp(player.x-world.viewW/2,0,Math.max(0,world.mapW-world.viewW)),y=clamp(player.y-world.viewH/2,0,Math.max(0,world.mapH-world.viewH)),f=Math.min(1,dt*10);world.cameraX+=(x-world.cameraX)*f;world.cameraY+=(y-world.cameraY)*f;}
   function resize(){const r=canvas.getBoundingClientRect();world.viewW=Math.max(1,r.width);world.viewH=Math.max(1,r.height);world.dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(world.viewW*world.dpr);canvas.height=Math.round(world.viewH*world.dpr);ctx.setTransform(world.dpr,0,0,world.dpr,0,0);cameraToPlayer(1);}
   addEventListener('resize',()=>{resize();syncOrientation();});addEventListener('orientationchange',syncOrientation);resize();syncOrientation();
-  function burst(x,y,color,count=8,power=120){for(let i=0;i<count;i++){const a=rand(0,Math.PI*2),v=rand(power*.25,power),life=rand(.25,.6);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life,max:life,r:rand(1.5,4),color});}}
+  function burst(x,y,color,count=8,power=120){count=Math.round(count*save.settings.particles/100);for(let i=0;i<count;i++){const a=rand(0,Math.PI*2),v=rand(power*.25,power),life=rand(.25,.6);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life,max:life,r:rand(1.5,4),color});}}
   function flashEffect(kind,x,y,color,life=.35,extra={}){effects.push({kind,x,y,color,life,max:life,...extra});}
   function toast(message,duration=1.7){$('toast').textContent=message;$('toast').classList.remove('hidden');state.toastTimer=duration;}
   function showScreen(id){state.screen=id;for(const s of screens)$(s).classList.toggle('hidden',s!==id);const active=state.mode==='playing'||state.mode==='tutorial';$('hud').classList.toggle('hidden',!active&&state.mode!=='paused'||!!id&&id!=='pauseScreen'&&id!=='tutorialScreen');$('mobileControls').classList.toggle('hidden',!active||!!id&&id!=='tutorialScreen');$('rotateNote').classList.toggle('hidden',!active||!!id&&id!=='tutorialScreen');}
@@ -482,7 +486,7 @@
   function draw(){
     const w=world.viewW,h=world.viewH;ctx.clearRect(0,0,w,h);ctx.fillStyle='#081725';ctx.fillRect(0,0,w,h);
     if(player&&state.mode!=='menu'){
-      ctx.save();ctx.translate((state.shake?rand(-state.shake,state.shake):0)-world.cameraX,(state.shake?rand(-state.shake,state.shake):0)-world.cameraY);
+      const shake=state.shake*save.settings.shake/100;ctx.save();ctx.translate((shake?rand(-shake,shake):0)-world.cameraX,(shake?rand(-shake,shake):0)-world.cameraY);
       drawTerrain();drawObstacles();drawTutorialMarker();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
       for(const e of enemies)drawMonster(e);
       if(save.perks.includes('orb')){const a=state.time*3.4,x=player.x+Math.cos(a)*64,y=player.y+Math.sin(a)*64;ctx.save();ctx.shadowColor='#8deaff';ctx.shadowBlur=18;circle(x,y,12,'#baf6ff');ctx.restore();}
@@ -519,19 +523,31 @@
   }
   function openShop(fromPause=false){if(fromPause){state.mode='paused';state.panelReturn='pauseScreen';}else{state.mode='menu';state.panelReturn='menu';}renderShop();showScreen('shopScreen');}
   function keyLabel(key){return key===' '?'LEERTASTE':key.startsWith('arrow')?key.replace('arrow','PFEIL ').toUpperCase():key.toUpperCase();}
-  function applySettings(){const s=save.settings;const app=$('app');app.style.setProperty('--joy-left',`${s.joyX}%`);app.style.setProperty('--joy-bottom',`${s.joyY}%`);app.style.setProperty('--fire-right',`${s.fireX}%`);app.style.setProperty('--fire-bottom',`${s.fireY}%`);}
-  const sliderDefs=[['master','GESAMTLAUTSTÄRKE','%'],['music','MUSIK','%'],['sfx','SFX','%'],['joyX','JOYSTICK: ABSTAND LINKS','%'],['joyY','JOYSTICK: ABSTAND UNTEN','%'],['fireX','FEUER: ABSTAND RECHTS','%'],['fireY','FEUER: ABSTAND UNTEN','%']];
+  function applySettings(){const s=save.settings;const app=$('app');app.style.setProperty('--joy-left',`${s.joyX}%`);app.style.setProperty('--joy-bottom',`${s.joyY}%`);app.style.setProperty('--fire-right',`${s.fireX}%`);app.style.setProperty('--fire-bottom',`${s.fireY}%`);app.classList.toggle('motion-off',!s.menuMotion);}
+  const sliderDefs={
+    sound:[['master','GESAMTLAUTSTÄRKE',0,100],['music','MUSIK',0,100],['sfx','SFX',0,100]],
+    graphics:[['particles','PARTIKELEFFEKTE',0,100],['shake','KAMERAWACKELN',0,100],['menuMotion','MENÜANIMATION',0,1]],
+    mobile:[['joyX','JOYSTICK: ABSTAND LINKS',1,36],['joyY','JOYSTICK: ABSTAND UNTEN',1,36],['fireX','FEUER: ABSTAND RECHTS',1,36],['fireY','FEUER: ABSTAND UNTEN',1,36]]
+  };
   const keyDefs=[['up','NACH OBEN'],['down','NACH UNTEN'],['left','NACH LINKS'],['right','NACH RECHTS'],['fire','SCHIESSEN'],['pause','PAUSE']];
   let armedBinding=null;
-  function renderSettings(){const grid=$('settingsGrid');grid.innerHTML='';
-    const audioCard=document.createElement('div');audioCard.className='settings-card';audioCard.innerHTML='<h3>TON & MUSIK</h3>';
-    const touchCard=document.createElement('div');touchCard.className='settings-card';touchCard.innerHTML='<h3>HANDY-STEUERUNG</h3><p>Verschiebe die Buttons über ihre Abstände zum Rand.</p>';
-    for(const [id,label,unit] of sliderDefs){const box=document.createElement('label');box.className='setting-slider';box.innerHTML=`<span>${label}<strong>${save.settings[id]}${unit}</strong></span><input type="range" min="${id==='master'||id==='music'||id==='sfx'?0:1}" max="${id==='master'||id==='music'||id==='sfx'?100:36}" value="${save.settings[id]}">`;box.querySelector('input').oninput=e=>{const v=Number(e.target.value);save.settings[id]=v;regular.settings[id]=v;admin.settings=regular.settings;box.querySelector('strong').textContent=v+unit;applySettings();persist();};(id==='master'||id==='music'||id==='sfx'?audioCard:touchCard).append(box);}
-    const keyCard=document.createElement('div');keyCard.className='settings-card';keyCard.innerHTML='<h3>COMPUTER-TASTEN</h3><p>Tippe eine Taste an und drücke die neue Taste.</p>';
-    for(const [id,label] of keyDefs){const row=document.createElement('div');row.className='key-row';row.innerHTML=`<span>${label}</span><button type="button" data-bind="${id}">${keyLabel(save.settings.keys[id])}</button>`;row.querySelector('button').onclick=()=>{armedBinding=id;row.querySelector('button').textContent='TASTE DRÜCKEN';};keyCard.append(row);}
-    grid.append(audioCard,touchCard,keyCard);$('profileBtn').innerHTML=adminMode?'SPIELER-PROFIL AKTIVIEREN <span>◆</span>':'ADMIN-PROFIL AKTIVIEREN <span>∞</span>';
+  function renderSettings(){
+    const grid=$('settingsGrid');grid.innerHTML='';armedBinding=null;
+    document.querySelectorAll('#settingsTabs button').forEach(b=>{const selected=b.dataset.settingsTab===state.settingsTab;b.classList.toggle('selected',selected);b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;});
+    const card=document.createElement('div');card.className='settings-card';
+    const headings={sound:'TON & MUSIK',graphics:'GRAFIK',mobile:'HANDY-STEUERUNG',keyboard:'PC-STEUERUNG'};
+    const descriptions={sound:'Stelle Musik und Spielgeräusche getrennt ein.',graphics:'Reduziere Partikel und Kamerabewegung nach deinem Geschmack.',mobile:'Verschiebe Joystick und Feuerknopf über ihre Abstände zum Rand.',keyboard:'Tippe eine Taste an und drücke die neue Taste.'};
+    card.innerHTML=`<h3>${headings[state.settingsTab]}</h3><p>${descriptions[state.settingsTab]}</p>`;
+    if(state.settingsTab==='keyboard'){
+      for(const [id,label] of keyDefs){const row=document.createElement('div');row.className='key-row';row.innerHTML=`<span>${label}</span><button type="button" data-bind="${id}">${keyLabel(save.settings.keys[id])}</button>`;row.querySelector('button').onclick=()=>{armedBinding=id;row.querySelector('button').textContent='TASTE DRÜCKEN';};card.append(row);}
+    }else for(const [id,label,min,max] of sliderDefs[state.settingsTab]){
+      const box=document.createElement('label');box.className='setting-slider';const value=save.settings[id],display=id==='menuMotion'?(value?'AN':'AUS'):`${value}%`;
+      box.innerHTML=`<span>${label}<strong>${display}</strong></span><input type="range" min="${min}" max="${max}" value="${value}" aria-label="${label}">`;
+      box.querySelector('input').oninput=e=>{const v=Number(e.target.value);save.settings[id]=v;regular.settings[id]=v;admin.settings=regular.settings;box.querySelector('strong').textContent=id==='menuMotion'?(v?'AN':'AUS'):`${v}%`;applySettings();persist();};card.append(box);
+    }
+    grid.append(card);$('profileBtn').innerHTML=adminMode?'SPIELER-PROFIL AKTIVIEREN <span>◆</span>':'ADMIN-PROFIL AKTIVIEREN <span>∞</span>';
   }
-  function openSettings(){state.mode='menu';renderSettings();showScreen('settingsScreen');}
+  function openSettings(fromPause=false){state.mode=fromPause?'paused':'menu';state.panelReturn=fromPause?'pauseScreen':'menu';$('settingsActions').classList.toggle('hidden',fromPause);renderSettings();showScreen('settingsScreen');}
   const tutorialSteps=[
     {icon:'➤',title:'BEWEGEN',body:'Handy: linker Stick. PC: WASD oder Pfeiltasten. Gehe ein Stück über das Trainingsfeld.',goal:'Lege 110 Schritte zurück'},
     {icon:'◎',title:'SCHIESSEN',body:'Halte FEUER gedrückt oder nutze die Leertaste. Schüsse haben eine kurze Pause. Besiege die Zielpuppe.',goal:'Zielpuppe besiegen'},
@@ -589,16 +605,17 @@
   function pause(){if(state.mode!=='playing')return;state.mode='paused';input.fire=false;showScreen('pauseScreen');}
   function resume(){if(state.mode!=='paused')return;state.mode='playing';state.last=performance.now();state.accumulator=0;showScreen(null);}
   function backFromPanel(){armedBinding=null;if(state.panelReturn==='pauseScreen'){state.mode='paused';showScreen('pauseScreen');}else openMenu();}
-  $('playBtn').onclick=()=>startLevel(Math.min(save.unlocked,C.MAX_LEVEL));$('levelsBtn').onclick=openLevels;$('shopBtn').onclick=()=>openShop(false);$('settingsBtn').onclick=openSettings;$('tutorialBtn').onclick=()=>startTutorial(false);
+  $('playBtn').onclick=()=>startLevel(Math.min(save.unlocked,C.MAX_LEVEL));$('levelsBtn').onclick=openLevels;$('shopBtn').onclick=()=>openShop(false);$('settingsBtn').onclick=()=>openSettings(false);$('tutorialBtn').onclick=()=>startTutorial(false);
   document.querySelectorAll('[data-back="menu"]').forEach(b=>b.onclick=backFromPanel);
   document.querySelectorAll('#shopTabs button').forEach(b=>b.onclick=()=>{state.shopTab=b.dataset.tab;renderShop();});
+  document.querySelectorAll('#settingsTabs button').forEach(b=>b.onclick=()=>{state.settingsTab=b.dataset.settingsTab;renderSettings();});
   $('profileBtn').onclick=changeProfile;$('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialUpgradeBtn').onclick=()=>{if(state.mode!=='tutorial'||state.tutorialStep!==5)return;player.trainingBonus=true;state.tutorial.upgraded=true;flashEffect('ring',player.x,player.y,'#a4ffdf',.6,{r:90});sfx('power');toast('PROBE-UPGRADE: +12 SCHADEN');};$('tutorialNext').onclick=()=>{if(state.mode!=='tutorialComplete')return;if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();};$('tutorialSkip').onclick=skipTutorial;
-  $('pauseBtn').onclick=pause;$('resumeBtn').onclick=resume;$('restartBtn').onclick=()=>startLevel(state.level);$('shopFromPause').onclick=()=>openShop(true);$('menuFromPause').onclick=openMenu;
+  $('pauseBtn').onclick=pause;$('resumeBtn').onclick=resume;$('restartBtn').onclick=()=>startLevel(state.level);$('settingsFromPause').onclick=()=>openSettings(true);$('shopFromPause').onclick=()=>openShop(true);$('menuFromPause').onclick=openMenu;
   $('resultShop').onclick=()=>openShop(false);$('resultMenu').onclick=openMenu;
   function keyOf(e){return e.key.toLowerCase();}
   addEventListener('keydown',e=>{const k=keyOf(e);if(armedBinding){e.preventDefault();if(Object.entries(save.settings.keys).some(([action,key])=>action!==armedBinding&&key===k)){toast('TASTE BEREITS VERGEBEN');return;}save.settings.keys[armedBinding]=k;regular.settings.keys[armedBinding]=k;armedBinding=null;persist();renderSettings();return;}
     if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)||Object.values(save.settings.keys).includes(k))e.preventDefault();
-    if(k===save.settings.keys.pause||k==='escape'){if(state.mode==='playing')pause();else if(state.mode==='paused')resume();}
+    if(k===save.settings.keys.pause||k==='escape'){if(state.screen==='settingsScreen'){backFromPanel();return;}if(state.mode==='playing')pause();else if(state.mode==='paused'&&state.screen==='pauseScreen')resume();}
     input.keys.add(k);
   });
   addEventListener('keyup',e=>input.keys.delete(keyOf(e)));
