@@ -1,10 +1,10 @@
-# Stickman Siege v11
+# Stickman Siege v12
 
-Die Handy-Steuerung und das Spielfeld wurden korrigiert.
+Neue Funktionen aus der Ideen- und Richter-Runde:
 
-- Der Joystick stoppt die Figur sofort, wenn die Fingererfassung verloren geht, beim Pausieren oder beim Wechsel in ein Menü.
-- Ein kleiner Totbereich verhindert unbeabsichtigte Bewegung nahe der Joystick-Mitte.
-- Spielfeld und Zeichenpuffer passen sich nach Größen- und Orientierungswechseln an. Kisten sind quadratisch; die Figur bleibt im kurzen Querformat oberhalb der Tutorialkarte sichtbar.
-- 19 automatische Tests bestanden. Browserprüfung bei 667 × 300 und 568 × 320 Pixeln ohne JavaScript-Fehler.
+- Seltene Elite-Monster erscheinen ab Level 5 in regulären Wellen. Pro Welle höchstens eines; Goldring und Markierung heben es hervor. Nach dem Sieg fällt genau ein Powerup zusätzlich zu Münzen und XP.
+- Ein Beute-Kompass am Spielfeldrand zeigt Richtung und Symbol eines Powerups außerhalb der Ansicht. Nach Einsammeln oder Ablauf verschwindet er.
+- Bosskampf und Tutorial enthalten keine Elite-Monster. Auf dem Handy ist keine neue Taste nötig.
+- 21 automatische Tests bestanden; Browseransichten bei 568 × 320 und 667 × 300 Pixeln geprüft.
 
 Android und iOS: [Spiel im Browser öffnen](https://stickman-siege-2d-20261106.bestcurry2.chatgpt.site/) und zum Startbildschirm hinzufügen. Das ZIP enthält die Offline-Version für PC/Mac.
