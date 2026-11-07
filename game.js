@@ -20,6 +20,7 @@
   const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',settingsTab:'sound',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
   const trainingMap={...C.MAPS[0],name:'TRAININGSGELÄNDE',subtitle:'Dein erster Einsatz',ground:'#173d43',tile:'#29545a',line:'#8fe9dd55',accent:'#79f2e3',cover:'#3b7374',edge:'#a0dcd1',boss:'ÜBUNGSWÄCHTER'};
   const world={viewW:0,viewH:0,dpr:1,mapW:2200,mapH:2200,cameraX:0,cameraY:0,obstacles:[],decor:[]};
+  const reducedMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   let player=null,enemies=[],bullets=[],enemyBullets=[],particles=[],pickups=[],effects=[],nextEnemyId=1;
   const input={keys:new Set(),joyX:0,joyY:0,fire:false,mouseX:0,mouseY:0,mouseAim:false};
   let orientationBlocked=false,joyPointer=null;
@@ -403,6 +404,24 @@
     }
     ctx.strokeStyle=m.edge;ctx.lineWidth=7;ctx.strokeRect(8,8,world.mapW-16,world.mapH-16);
   }
+  function drawAmbientLights(){
+    if(save.settings.particles===0||reducedMotion)return;
+    const m=state.info.map,brightness=save.settings.particles/100;
+    ctx.save();ctx.fillStyle=m.accent;ctx.strokeStyle=m.accent;ctx.shadowColor=m.accent;
+    for(let i=0;i<world.decor.length;i+=7){
+      const d=world.decor[i];if(!visible(d.x,d.y,32))continue;
+      const pulse=(1+Math.sin(state.time*1.8+d.phase))/2;
+      ctx.globalAlpha=(.08+pulse*.24)*brightness;ctx.shadowBlur=7+pulse*12;
+      ctx.beginPath();ctx.arc(d.x,d.y,2.3+pulse*2.8,0,Math.PI*2);ctx.fill();
+      if(i%21===0){ctx.globalAlpha=(.04+pulse*.11)*brightness;ctx.lineWidth=1;ctx.beginPath();ctx.arc(d.x,d.y,9+pulse*6,0,Math.PI*2);ctx.stroke();}
+    }
+    const cx=world.mapW/2,cy=world.mapH/2;
+    if(visible(cx,cy,110)){
+      ctx.globalAlpha=(.08+.09*(1+Math.sin(state.time*2))/2)*brightness;ctx.shadowBlur=14;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(cx,cy,76+Math.sin(state.time*2)*3,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
+  }
   function drawObstacles(){const m=state.info.map;for(const o of world.obstacles){if(o.x>world.cameraX+world.viewW+110||o.x+o.w<world.cameraX-110||o.y>world.cameraY+world.viewH+110||o.y+o.h<world.cameraY-110)continue;
     ctx.save();ctx.shadowColor='#050a12a8';ctx.shadowBlur=15;ctx.shadowOffsetY=8;ctx.fillStyle=m.cover;ctx.fillRect(o.x,o.y,o.w,o.h);ctx.restore();
     ctx.fillStyle=m.tile;ctx.fillRect(o.x+4,o.y+4,o.w-8,o.h-8);ctx.strokeStyle=m.edge;ctx.lineWidth=2;ctx.strokeRect(o.x+1,o.y+1,o.w-2,o.h-2);
@@ -501,7 +520,7 @@
     const w=world.viewW,h=world.viewH;ctx.clearRect(0,0,w,h);ctx.fillStyle='#081725';ctx.fillRect(0,0,w,h);
     if(player&&state.mode!=='menu'){
       const shake=state.shake*save.settings.shake/100;ctx.save();ctx.translate((shake?rand(-shake,shake):0)-world.cameraX,(shake?rand(-shake,shake):0)-world.cameraY);
-      drawTerrain();drawObstacles();drawTutorialMarker();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
+      drawTerrain();drawAmbientLights();drawObstacles();drawTutorialMarker();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
       for(const e of enemies)drawMonster(e);
       if(save.perks.includes('orb')){const a=state.time*3.4,x=player.x+Math.cos(a)*64,y=player.y+Math.sin(a)*64;ctx.save();ctx.shadowColor='#8deaff';ctx.shadowBlur=18;circle(x,y,12,'#baf6ff');ctx.restore();}
       drawPlayer();drawEffects();for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);circle(p.x,p.y,p.r,p.color);}ctx.globalAlpha=1;ctx.restore();
@@ -540,7 +559,7 @@
   function applySettings(){const s=save.settings;const app=$('app');app.style.setProperty('--joy-left',`${s.joyX}%`);app.style.setProperty('--joy-bottom',`${s.joyY}%`);app.style.setProperty('--fire-right',`${s.fireX}%`);app.style.setProperty('--fire-bottom',`${s.fireY}%`);app.classList.toggle('motion-off',!s.menuMotion);}
   const sliderDefs={
     sound:[['master','GESAMTLAUTSTÄRKE',0,100],['music','MUSIK',0,100],['sfx','SFX',0,100]],
-    graphics:[['particles','PARTIKELEFFEKTE',0,100],['shake','KAMERAWACKELN',0,100],['menuMotion','MENÜANIMATION',0,1]],
+    graphics:[['particles','PARTIKELEFFEKTE',0,100],['shake','KAMERAWACKELN',0,100],['menuMotion','MENÜ-EFFEKTE',0,1]],
     mobile:[['joyX','JOYSTICK: ABSTAND LINKS',1,36],['joyY','JOYSTICK: ABSTAND UNTEN',1,36],['fireX','FEUER: ABSTAND RECHTS',1,36],['fireY','FEUER: ABSTAND UNTEN',1,36]]
   };
   const keyDefs=[['up','NACH OBEN'],['down','NACH UNTEN'],['left','NACH LINKS'],['right','NACH RECHTS'],['fire','SCHIESSEN'],['pause','PAUSE']];

@@ -168,3 +168,31 @@
   .health-wrap{width:115px;min-width:115px}.health-title span:first-child{font-size:0}.health-title .health-heart{font-size:14px}.health-title span:last-child{font-size:9px;white-space:nowrap}.hud-bottom{left:251px;right:45px}.xp-track{display:none}
   .tutorial-card{width:calc(100vw - 270px)}
 }
+
+/* Soft moving light in menus; button highlights stay visible on touch screens. */
+.menu-screen::before,.panel-screen::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle at 18% 28%,#48e2dd26 0,transparent 28%),radial-gradient(circle at 78% 68%,#f6a86118 0,transparent 25%),radial-gradient(circle at 52% 88%,#68a7ff14 0,transparent 24%);background-size:125% 125%;background-position:0 0;animation:ambient-drift 10s ease-in-out infinite alternate}
+.panel-screen .panel{z-index:1}
+.menu-figure .figure-glow{animation:figure-aura 4.8s ease-in-out infinite}
+.menu-figure .figure-target{animation:target-pulse 3.8s ease-in-out infinite}
+.menu-figure .target-two{animation-delay:-1.8s}
+@keyframes ambient-drift{to{background-position:100% 60%}}
+@keyframes figure-aura{50%{opacity:.58;filter:brightness(1.35)}}
+@keyframes target-pulse{50%{opacity:.35;box-shadow:0 0 18px #53e7dc45}}
+.primary-button,.secondary-button,.shop-buy,.tutorial-action,.map-card:not(:disabled),.level-card:not(:disabled),.settings-tabs button{position:relative;overflow:hidden;transition:transform .16s ease,box-shadow .22s ease,border-color .22s ease,filter .22s ease}
+.primary-button::after,.secondary-button::after,.shop-buy:not(:disabled)::after,.tutorial-action::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 32%,#ffffff00 40%,#ffffff55 50%,#ffffff00 60%,transparent 68%);transform:translateX(-140%);animation:button-sheen 5.2s ease-in-out infinite}
+.secondary-button::after{animation-delay:-2.6s;opacity:.5}
+.shop-buy:not(:disabled)::after{animation-delay:-1.3s;opacity:.55}
+@keyframes button-sheen{0%,60%{transform:translateX(-140%)}85%,100%{transform:translateX(140%)}}
+.primary-button{animation:primary-aura 3.8s ease-in-out infinite}
+@keyframes primary-aura{50%{box-shadow:0 7px 26px #38e9e48a,0 0 0 1px #9ffdf783}}
+.menu-actions .secondary-button{box-shadow:inset 0 0 15px #54e6df0b,0 0 12px #54e6df13}
+.menu-actions .secondary-button{animation:secondary-aura 4.8s ease-in-out infinite}
+.menu-actions .secondary-button:nth-child(2n){animation-delay:-2.4s}
+.menu-actions .secondary-button:nth-child(3n){animation-delay:-1.2s}
+@keyframes secondary-aura{50%{border-color:#70e9e0a8;box-shadow:inset 0 0 16px #54e6df1c,0 0 15px #54e6df42}}
+.fire-button{animation:fire-aura 2.8s ease-in-out infinite}
+@keyframes fire-aura{50%{box-shadow:0 0 0 11px #f4a76728,0 0 23px #f4a767a0}}
+.map-card:not(:disabled):active,.level-card:not(:disabled):active,.settings-tabs button:active,.primary-button:active,.secondary-button:active,.shop-buy:not(:disabled):active,.tutorial-action:active{transform:scale(.975);filter:brightness(1.2)}
+@media(hover:hover){.primary-button:hover,.secondary-button:hover,.shop-buy:not(:disabled):hover,.map-card:not(:disabled):hover,.level-card:not(:disabled):hover,.settings-tabs button:hover{transform:translateY(-2px);box-shadow:0 8px 24px #3ee6e044}}
+#app.motion-off .menu-screen::before,#app.motion-off .panel-screen::before,#app.motion-off .menu-figure .figure-glow,#app.motion-off .menu-figure .figure-target,#app.motion-off .primary-button,#app.motion-off .primary-button::after,#app.motion-off .secondary-button,#app.motion-off .secondary-button::after,#app.motion-off .shop-buy::after,#app.motion-off .tutorial-action::after{animation:none!important}
+@media(prefers-reduced-motion:reduce){.menu-screen::before,.panel-screen::before,.menu-figure .figure-glow,.menu-figure .figure-target,.primary-button,.primary-button::after,.secondary-button,.secondary-button::after,.shop-buy::after,.tutorial-action::after,.fire-button{animation:none!important}.primary-button,.secondary-button,.shop-buy,.tutorial-action,.map-card,.level-card,.settings-tabs button{transition:none!important}}
