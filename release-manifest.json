@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "versions": [
+    {
+      "version": 1,
+      "asset": "downloads/Stickman-Siege-PC-v1.zip"
+    },
+    {
+      "version": 2,
+      "asset": "downloads/Stickman-Siege-Mobile-v2.zip"
+    },
+    {
+      "version": 3,
+      "asset": "downloads/Stickman-Siege-PC-v3.zip"
+    },
+    {
+      "version": 4,
+      "asset": "downloads/Stickman-Siege-PC-v4.zip"
+    },
+    {
+      "version": 5,
+      "asset": "downloads/Stickman-Siege-PC-v5.zip"
+    },
+    {
+      "version": 6,
+      "asset": "downloads/Stickman-Siege-PC-v6.zip"
+    },
+    {
+      "version": 7,
+      "asset": "downloads/Stickman-Siege-PC-v7.zip"
+    },
+    {
+      "version": 8,
+      "asset": "downloads/Stickman-Siege-PC-v8.zip"
+    },
+    {
+      "version": 9,
+      "asset": "downloads/Stickman-Siege-PC-v9.zip"
+    },
+    {
+      "version": 10,
+      "asset": "downloads/Stickman-Siege-PC-v10.zip"
+    }
+  ]
+}
