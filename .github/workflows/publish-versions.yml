@@ -1,0 +1,31 @@
+name: Publish Stickman Siege versions
+on:
+  push:
+    paths:
+      - release-manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  releases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish versions in order
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for number in $(seq 1 10); do
+            tag="v${number}"
+            archive=$(jq -r --argjson version "$number" '.versions[] | select(.version == $version) | .asset' release-manifest.json)
+            test -f "$archive"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$tag already exists"
+              continue
+            fi
+            gh release create "$tag" "$archive" --title "Stickman Siege ${tag}" --notes-file "release-notes/${tag}.md" --target "$GITHUB_SHA"
+          done
