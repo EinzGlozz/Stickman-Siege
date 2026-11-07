@@ -196,3 +196,5 @@
 @media(hover:hover){.primary-button:hover,.secondary-button:hover,.shop-buy:not(:disabled):hover,.map-card:not(:disabled):hover,.level-card:not(:disabled):hover,.settings-tabs button:hover{transform:translateY(-2px);box-shadow:0 8px 24px #3ee6e044}}
 #app.motion-off .menu-screen::before,#app.motion-off .panel-screen::before,#app.motion-off .menu-figure .figure-glow,#app.motion-off .menu-figure .figure-target,#app.motion-off .primary-button,#app.motion-off .primary-button::after,#app.motion-off .secondary-button,#app.motion-off .secondary-button::after,#app.motion-off .shop-buy::after,#app.motion-off .tutorial-action::after{animation:none!important}
 @media(prefers-reduced-motion:reduce){.menu-screen::before,.panel-screen::before,.menu-figure .figure-glow,.menu-figure .figure-target,.primary-button,.primary-button::after,.secondary-button,.secondary-button::after,.shop-buy::after,.tutorial-action::after,.fire-button{animation:none!important}.primary-button,.secondary-button,.shop-buy,.tutorial-action,.map-card,.level-card,.settings-tabs button{transition:none!important}}
+#app{min-height:0}
+#game{position:absolute;inset:0;width:100%;height:100%}
