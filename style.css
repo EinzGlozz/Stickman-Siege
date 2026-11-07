@@ -131,3 +131,40 @@
 .admin-option output{grid-column:2;text-align:right;color:#73eae1;font-size:12px;font-weight:900}
 @media(max-width:720px){.admin-grid{grid-template-columns:1fr}.admin-option{min-height:76px}.admin-panel .panel-header{margin-bottom:14px}.admin-panel h2{font-size:clamp(48px,8vw,70px)}}
 @media(max-height:450px){.admin-option{min-height:66px;padding:10px 14px}.admin-panel>.primary-button{min-height:42px;margin:8px 0 12px}}
+
+/* Landscape phones: keep the arena clear and give each screen its own space. */
+@media(max-height:480px) and (orientation:landscape){
+  #app{min-height:0}
+  .menu-screen{overflow:hidden}
+  .menu-screen .screen-content{height:100%;min-height:0;padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.9fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:18px}
+  .menu-top{grid-column:1/-1;grid-row:1}.menu-top .brand-mark{font-size:9px}.menu-top .menu-coins{padding:5px 10px;font-size:11px}
+  .menu-screen .hero{grid-column:1;grid-row:2;align-self:center;margin:0;max-width:none}
+  .menu-screen .hero-kicker{font-size:9px;margin-bottom:6px}.menu-screen .hero h1{font-size:clamp(51px,9vw,76px)}
+  .menu-screen .hero p{font-size:11px;line-height:1.35;margin:9px 0 0;max-width:330px}
+  .menu-screen .menu-actions{grid-column:2;grid-row:2;align-self:center;width:100%;max-width:none;gap:6px}
+  .menu-screen .menu-actions .primary-button{height:45px;min-height:45px;font-size:11px}
+  .menu-screen .menu-actions .secondary-button{height:40px;min-height:40px;font-size:9px;padding:0 9px}
+  .menu-screen .menu-footer{grid-column:1/-1;grid-row:3;margin:0;padding-top:7px;width:100%;gap:18px}
+  .menu-screen .menu-footer div:nth-child(2){display:flex}.menu-screen .menu-footer strong{font-size:10px}
+  .menu-figure{display:none}
+  .panel{padding:14px max(16px,env(safe-area-inset-right)) 28px max(16px,env(safe-area-inset-left))}
+  .panel-header,.settings-panel .panel-header,.admin-panel .panel-header{margin-bottom:12px}
+  .panel h2{font-size:clamp(42px,7vw,58px)}.panel-subtitle{font-size:12px;line-height:1.35;margin:8px 0 14px}
+  .hud{padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left))}
+  .hud-top{gap:6px}.hud-level{width:150px;min-width:150px;max-width:150px;height:56px;padding:6px 8px;display:grid;grid-template-columns:1fr auto;grid-template-rows:1fr auto;align-items:center;gap:0 4px;overflow:hidden}
+  .hud-level .eyebrow{display:none}.hud-level strong{grid-column:1/-1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;line-height:1}
+  .hud-level #hudLevel,.hud-level #hudWave{font-size:9px;line-height:1;white-space:nowrap}.hud-level #hudLevel{grid-column:1}.hud-level #hudWave{grid-column:2}
+  .health-wrap{width:140px;min-width:140px;height:56px;padding:7px 8px}.health-title{font-size:9px;margin-bottom:5px}
+  .hud-bottom{position:absolute;top:8px;left:316px;right:50px;bottom:auto;display:block}
+  .hud-resources{display:flex;flex-wrap:nowrap;gap:5px}.coin-pill,.xp-pill{min-height:32px;padding:5px 7px;font-size:10px}.xp-track{width:40px}
+  .boss-hud{position:absolute;top:58px;right:0;min-width:160px;max-width:45vw}.buff-bar{position:absolute;top:58px;left:0;max-width:42vw;margin:0}
+  .tutorial-card{top:auto;bottom:max(8px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(450px,calc(100vw - 300px));max-height:calc(100dvh - 82px);padding:9px 12px;overflow:auto}
+  .tutorial-card h2{font-size:21px;margin:5px 0 3px}.tutorial-card p{font-size:11px;line-height:1.35}.tutorial-goal{font-size:10px;margin-top:5px}.tutorial-progress{justify-content:flex-start;margin:6px 0 0}.tutorial-skip{margin-top:5px}
+  .tutorial-screen.completed .tutorial-card{top:50%;bottom:auto;left:50%;transform:translate(-50%,-50%);width:min(430px,calc(100vw - 36px))}
+}
+@media(max-width:620px) and (max-height:480px) and (orientation:landscape){
+  .menu-screen .screen-content{grid-template-columns:minmax(0,1fr) minmax(225px,.9fr);column-gap:10px}.menu-screen .hero h1{font-size:clamp(44px,8.7vw,58px)}
+  .hud-level{width:118px;min-width:118px;max-width:118px}.hud-level strong{font-size:12px}.hud-level #hudLevel,.hud-level #hudWave{font-size:8px}
+  .health-wrap{width:115px;min-width:115px}.health-title span:first-child{font-size:0}.health-title .health-heart{font-size:14px}.health-title span:last-child{font-size:9px;white-space:nowrap}.hud-bottom{left:251px;right:45px}.xp-track{display:none}
+  .tutorial-card{width:calc(100vw - 270px)}
+}
