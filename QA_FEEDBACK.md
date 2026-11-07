@@ -1,4 +1,14 @@
-# QA-Feedback · Version 11
+# QA-Feedback · Version 12
+
+Die Ideen-, Pro- und Kritik-Agenten haben neue Funktionen vorgeschlagen und bewertet. Der Richter-Agent hat Elite-Monster und Beute-Kompass für Version 12 ausgewählt. Wellenwahl und Kartenereignisse wurden wegen Eingriffen in Spielfluss und Balance zurückgestellt; eine Kill-Serie bleibt ein Vorschlag für später.
+
+## Tests für Version 12
+
+- `node --test tests/*.test.js`: 21 von 21 bestanden. Neu geprüft: höchstens ein Elite-Monster pro regulärer Welle, garantierte einzelne Powerup-Beute, Ausschluss von Boss und Tutorial sowie Anzeige des Kompasses nur für lebende Powerups außerhalb der Ansicht.
+- Die unabhängige QA fand in den geprüften Codepfaden keine blockierenden Fehler. Die Browser-Konsole zeigte keine JavaScript-Fehler.
+- Im lokalen Browser bei 568 × 320 und 667 × 300 Pixeln geprüft: Goldring und Elite-Markierung sind sichtbar; der Kompass bleibt von Joystick und Feuerknopf getrennt. Ein Test mit echten Fingerbewegungen auf iOS und Android steht noch aus.
+
+## Vorherige Prüfung
 
 Version 11 behebt das Hängenbleiben der Handy-Bewegung bei verlorener Pointer-Erfassung und sichert die Spielfeldmaße nach Größenwechseln ab. Die Kisten sind jetzt quadratisch. Im lokalen Browser waren Spielfeld, Figur und Tutorial bei 667 × 300 Pixeln sichtbar; die Canvas-CSS-Größe und der Zeichenpuffer betrugen jeweils 667 × 300 Pixel.
 

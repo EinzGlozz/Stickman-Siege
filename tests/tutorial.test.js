@@ -164,3 +164,46 @@ test('mobile movement stops when pointer capture is lost and after pausing',()=>
   h.qa.step(.1);
   assert.equal(h.qa.snapshot().player.x,paused);
 });
+
+test('at most one elite appears in a regular wave and drops exactly one powerup',()=>{
+  const h=gameHarness();
+  h.el('adminProfileBtn').onclick();
+  h.qa.startLevel(5);
+  h.qa.setEliteSlot(0);
+  h.qa.spawnEnemy();
+  assert.equal(h.qa.snapshot().enemies[0].elite,true);
+  h.qa.damageFirstEnemy(1e9);
+  assert.equal(h.qa.snapshot().pickups.filter(p=>p.kind==='power').length,1);
+  h.qa.spawnEnemy();
+  assert.equal(h.qa.snapshot().enemies[0].elite,false);
+  h.qa.beginWave(2);
+  h.qa.setEliteSlot(0);
+  h.qa.spawnEnemy();
+  assert.equal(h.qa.snapshot().enemies.at(-1).elite,true);
+  h.qa.startLevel(30);
+  h.qa.beginWave(3);
+  assert.equal(h.qa.snapshot().eliteSlot,-1);
+  h.qa.spawnEnemy();
+  assert.equal(h.qa.snapshot().enemies[0].type,'boss');
+  assert.equal(h.qa.snapshot().enemies[0].elite,false);
+  h.qa.startTutorial(false);
+  h.qa.setEliteSlot(0);
+  h.qa.spawnEnemy();
+  assert.equal(h.qa.snapshot().enemies[0].elite,false);
+});
+
+test('loot compass points only to an offscreen live powerup',()=>{
+  const h=gameHarness();
+  h.el('adminProfileBtn').onclick();
+  h.qa.startLevel(1);
+  const {player,view}=h.qa.snapshot();
+  h.qa.dropPower('rapid',player.x+100,player.y);
+  assert.equal(h.qa.snapshot().lootCompass,null);
+  h.qa.dropPower('rapid',player.x+view.width/2+100,player.y);
+  let hint=h.qa.snapshot().lootCompass;
+  assert.equal(hint.power,'rapid');
+  assert.ok(hint.x<=view.width-34&&hint.x>=34);
+  assert.ok(hint.y>=90&&hint.y<=view.height-150);
+  h.qa.expirePower();
+  assert.equal(h.qa.snapshot().lootCompass,null);
+});
