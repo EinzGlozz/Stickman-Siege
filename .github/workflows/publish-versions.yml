@@ -13,19 +13,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Publish versions in order
+      - name: Build historic tags and publish releases
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          scratch="$(mktemp -d)"
+          cp -a downloads release-notes release-manifest.json "$scratch/"
+          if ! git ls-remote --exit-code --heads origin release-history >/dev/null 2>&1; then
+            git config user.name "Stickman Siege Release Bot"
+            git config user.email "actions@users.noreply.github.com"
+            git switch --orphan release-history
+            git rm -r -q . || true
+            git clean -fdx -q
+            for number in $(seq 1 10); do
+              tag="v${number}"
+              archive=$(jq -r --argjson version "$number" '.versions[] | select(.version == $version) | .asset' "$scratch/release-manifest.json")
+              staging="$scratch/stage"
+              rm -rf "$staging"
+              mkdir -p "$staging"
+              unzip -q "$scratch/$archive" -d "$staging"
+              if test -d "$staging/Stickman-Siege"; then
+                cp -a "$staging/Stickman-Siege/." .
+              else
+                cp -a "$staging/." .
+              fi
+              cp "$scratch/release-notes/${tag}.md" RELEASE_NOTES.md
+              git add -A
+              git commit -m "Stickman Siege ${tag}"
+              git tag -a "$tag" -m "Stickman Siege ${tag}"
+              if test "$number" -lt 10; then
+                git rm -r -q . || true
+                git clean -fdx -q
+              fi
+            done
+            git push origin release-history --tags
+          fi
           for number in $(seq 1 10); do
             tag="v${number}"
-            archive=$(jq -r --argjson version "$number" '.versions[] | select(.version == $version) | .asset' release-manifest.json)
-            test -f "$archive"
+            archive=$(jq -r --argjson version "$number" '.versions[] | select(.version == $version) | .asset' "$scratch/release-manifest.json")
             if gh release view "$tag" >/dev/null 2>&1; then
-              echo "$tag already exists"
+              echo "$tag already published"
               continue
             fi
-            gh release create "$tag" "$archive" --title "Stickman Siege ${tag}" --notes-file "release-notes/${tag}.md" --target "$GITHUB_SHA"
+            gh release create "$tag" "$scratch/$archive" --title "Stickman Siege ${tag}" --notes-file "$scratch/release-notes/${tag}.md"
           done
