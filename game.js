@@ -13,7 +13,8 @@
   let save=adminMode?admin:regular;
   function persist(){if(adminMode)return;try{localStorage.setItem('stickman-siege-v3',JSON.stringify(regular));}catch{}}
   function changeProfile(){adminMode=!adminMode;save=adminMode?admin:regular;try{localStorage.setItem('stickman-siege-profile',adminMode?'admin':'player');}catch{}renderSettings();renderMenu();toast(adminMode?'ADMIN-PROFIL AKTIV':'SPIELER-PROFIL AKTIV');}
-  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false};
+  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
+  const trainingMap={...C.MAPS[0],name:'TRAININGSGELÄNDE',subtitle:'Dein erster Einsatz',ground:'#173d43',tile:'#29545a',line:'#8fe9dd55',accent:'#79f2e3',cover:'#3b7374',edge:'#a0dcd1',boss:'ÜBUNGSWÄCHTER'};
   const world={viewW:0,viewH:0,dpr:1,mapW:2200,mapH:2200,cameraX:0,cameraY:0,obstacles:[],decor:[]};
   let player=null,enemies=[],bullets=[],enemyBullets=[],particles=[],pickups=[],effects=[],nextEnemyId=1;
   const input={keys:new Set(),joyX:0,joyY:0,fire:false,mouseX:0,mouseY:0,mouseAim:false};
@@ -23,6 +24,7 @@
   function requestLandscape(){try{screen.orientation?.lock?.('landscape').catch(()=>{});}catch{}}
   const clamp=C.clamp,rand=(a,b)=>a+Math.random()*(b-a),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   const enemyDefs={
+    dummy:{hp:55,speed:0,r:18,damage:0,coin:0,xp:0,reach:0,attack:99,color:'#ffcb85'},
     zombie:{hp:46,speed:70,r:17,damage:11,coin:13,xp:11,reach:38,attack:1.15,color:'#8cc27a'},
     skeleton:{hp:35,speed:65,r:15,damage:12,coin:17,xp:14,reach:0,attack:2.05,color:'#e9e4d0',ranged:true},
     ghoul:{hp:34,speed:120,r:15,damage:10,coin:18,xp:16,reach:36,attack:.9,color:'#b184c9'},
@@ -51,7 +53,7 @@
     else if(kind==='hurt')tone(85,.2,'sawtooth',.16);
   }
   function updateMusic(dt){
-    if(state.mode!=='playing'||!audio.ctx)return;
+    if(!['playing','tutorial'].includes(state.mode)||!audio.ctx)return;
     state.musicTimer-=dt;if(state.musicTimer>0)return;
     const boss=state.info.boss&&state.wave===3;
     const notes=boss?[110,165,130,196,146,220,130,165]:[196,247,294,247,220,261,330,261];
@@ -88,6 +90,14 @@
       world.decor.push({x,y,kind:Math.floor(rng()*4),size:between(4,16),phase:between(0,6.28)});
     }
   }
+  function generateTutorialArena(){
+    world.mapW=2200;world.mapH=2200;world.obstacles=[
+      {x:690,y:730,w:170,h:34,kind:'wall'},{x:740,y:765,w:34,h:120,kind:'wall'},
+      {x:1450,y:1310,w:165,h:35,kind:'wall'},{x:1580,y:1190,w:35,h:120,kind:'wall'},
+      {x:850,y:1430,w:80,h:80,kind:'crate'},{x:1510,y:800,w:76,h:76,kind:'crate'}
+    ];world.decor=[];const rng=makeRng(314159);
+    for(let i=0;i<170;i++){const x=80+rng()*2040,y=80+rng()*2040;if(Math.hypot(x-1100,y-1100)<300||blocked(x,y,20))continue;world.decor.push({x,y,kind:i%4,size:5+rng()*10,phase:rng()*6.28});}
+  }
   function moveCircle(body,dx,dy){
     body.x=clamp(body.x+dx,body.r+10,world.mapW-body.r-10);
     for(const o of world.obstacles)if(circleRect(body.x,body.y,body.r,o))body.x=dx>0?o.x-body.r:dx<0?o.x+o.w+body.r:body.x;
@@ -114,11 +124,11 @@
   function burst(x,y,color,count=8,power=120){for(let i=0;i<count;i++){const a=rand(0,Math.PI*2),v=rand(power*.25,power),life=rand(.25,.6);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life,max:life,r:rand(1.5,4),color});}}
   function flashEffect(kind,x,y,color,life=.35,extra={}){effects.push({kind,x,y,color,life,max:life,...extra});}
   function toast(message,duration=1.7){$('toast').textContent=message;$('toast').classList.remove('hidden');state.toastTimer=duration;}
-  function showScreen(id){state.screen=id;for(const s of screens)$(s).classList.toggle('hidden',s!==id);$('hud').classList.toggle('hidden',!(state.mode==='playing'||state.mode==='paused')||!!id&&id!=='pauseScreen');$('mobileControls').classList.toggle('hidden',state.mode!=='playing'||!!id);$('rotateNote').classList.toggle('hidden',state.mode!=='playing'||!!id);}
+  function showScreen(id){state.screen=id;for(const s of screens)$(s).classList.toggle('hidden',s!==id);const active=state.mode==='playing'||state.mode==='tutorial';$('hud').classList.toggle('hidden',!active&&state.mode!=='paused'||!!id&&id!=='pauseScreen'&&id!=='tutorialScreen');$('mobileControls').classList.toggle('hidden',!active||!!id&&id!=='tutorialScreen');$('rotateNote').classList.toggle('hidden',!active||!!id&&id!=='tutorialScreen');}
   function renderMenu(){const info=C.levelInfo(Math.min(save.unlocked,C.MAX_LEVEL));$('menuCoins').textContent=adminMode?'∞':save.coins;$('shopCoins').textContent=adminMode?'∞':save.coins;$('progressText').textContent=`${info.map.name} · LEVEL ${String(info.local).padStart(2,'0')} / 30`;$('profileText').textContent=adminMode?'ADMIN ∞':'SPIELER';$('playBtn').firstElementChild.textContent=save.unlocked>1?`LEVEL ${info.local} STARTEN`:'SPIEL STARTEN';}
   function updateHud(){
     if(!player)return;
-    $('hudMap').textContent=state.info.map.name;$('hudLevel').textContent=`${String(state.info.local).padStart(2,'0')} / 30`;$('hudWave').textContent=`WELLE ${state.wave}/3`;
+    $('hudMap').textContent=state.info.map.name;$('hudLevel').textContent=state.mode==='tutorial'?'TUTORIAL':`${String(state.info.local).padStart(2,'0')} / 30`;$('hudWave').textContent=state.mode==='tutorial'?`AUFGABE ${Math.min(state.tutorialStep+1,7)} / 7`:`WELLE ${state.wave}/3`;
     $('hudCoins').textContent=adminMode?'∞':save.coins;$('hpText').textContent=`${Math.ceil(Math.max(0,player.hp))} / ${player.maxHp}`;
     $('hpFill').style.transform=`scaleX(${clamp(state.hpDisplay/player.maxHp,0,1)})`;$('hpLag').style.transform=`scaleX(${clamp(state.hpTrail/player.maxHp,0,1)})`;$('healthWrap').classList.toggle('critical',player.hp/player.maxHp<.3);
     $('hudXpLevel').textContent=adminMode?'XP ∞':`XP ${save.xpLevel}`;$('xpFill').style.width=adminMode?'100%':`${clamp(save.xp/C.xpRequired(save.xpLevel)*100,0,100)}%`;
@@ -135,7 +145,7 @@
     const maxHp=100+save.upgrades.health*24;
     player={x:1100,y:1100,r:16,hp:maxHp,maxHp,angle:0,walk:0,attackAnim:0,specialAnim:0,specialCooldown:0,invuln:0,slowTimer:0,cooldowns:{},perkTimers:{},buffs:{rapid:0,invincible:0,double:0,magnet:0,slow:0}};
     state.hpDisplay=maxHp;state.hpTrail=maxHp;cameraToPlayer(1);beginWave(1);activateAudio();
-    if(!save.tutorialDone){startTutorial(true);}else{state.mode='playing';showScreen(null);}updateHud();
+    if(!save.tutorialDone&&!save.tutorialSkipped){startTutorial(true);}else{state.mode='playing';showScreen(null);}updateHud();
   }
   function chooseEnemyType(){
     const roll=Math.random(),m=state.info.mapIndex,l=state.info.local;
@@ -159,7 +169,7 @@
   function fireWeapon(w,a){
     if((player.cooldowns[w.id]||0)>0)return false;
     player.cooldowns[w.id]=C.weaponInterval(w,save.upgrades.rate,player.buffs.rapid>0);
-    const mult=player.buffs.double>0?2:1,damage=(w.damage+save.upgrades.damage*4)*mult;
+    const mult=player.buffs.double>0?2:1,damage=(w.damage+save.upgrades.damage*4+(player.trainingBonus?12:0))*mult;
     const extra=w.id===save.weapons[0]?Math.floor(save.upgrades.multi/2):0;
     for(let i=0;i<w.shots+extra;i++){
       const count=w.shots+extra,off=(i-(count-1)/2)*(w.spread||.075),ang=a+off;
@@ -167,7 +177,7 @@
     }
     player.attackAnim=.22;burst(player.x+Math.cos(a)*25,player.y+Math.sin(a)*25,w.color,3,65);sfx('shot');return true;
   }
-  function damageEnemy(e,amount,x=e.x,y=e.y){if(!enemies.includes(e))return;e.hp-=amount;e.hit=.13;burst(x,y,enemyDefs[e.type].color,4,55);sfx('hit');if(e.hp<=0)enemyDead(e);}
+  function damageEnemy(e,amount,x=e.x,y=e.y){if(!enemies.includes(e))return;if(e.trainingGuard){e.hit=.13;return;}e.hp-=amount;e.hit=.13;burst(x,y,enemyDefs[e.type].color,4,55);sfx('hit');if(e.hp<=0)enemyDead(e);}
   function areaDamage(x,y,r,amount){for(const e of [...enemies])if(Math.hypot(e.x-x,e.y-y)<r+e.r)damageEnemy(e,amount);}
   function specialAttack(a){
     if(player.specialCooldown>0)return;
@@ -248,6 +258,11 @@
   }
   function enemyDead(e){
     const i=enemies.indexOf(e);if(i<0)return;enemies.splice(i,1);state.kills++;
+    if(state.mode==='tutorial'){
+      if(e.type==='dummy'){state.tutorial.dummyDown=true;for(const [kind,offset] of [['coin',-18],['xp',18]])pickups.push({kind,x:e.x+offset,y:e.y,r:11,value:0,life:9999,t:0,training:true});}
+      if(e.type==='boss')state.tutorial.bossDown=true;
+      burst(e.x,e.y,enemyDefs[e.type].color,e.type==='boss'?30:14,150);state.shake=e.type==='boss'?8:2;return;
+    }
     const fortune=1+save.upgrades.fortune*.14;
     pickups.push({kind:'coin',x:e.x-11,y:e.y,r:9,value:Math.round(e.coin*fortune),life:15,t:0});
     pickups.push({kind:'xp',x:e.x+11,y:e.y,r:9,value:e.xp,life:15,t:0});
@@ -258,12 +273,13 @@
   }
   function collectPickup(p){
     const i=pickups.indexOf(p);if(i<0)return;pickups.splice(i,1);
+    if(state.mode==='tutorial'&&p.training){if(p.kind==='coin')state.tutorial.coin=true;else if(p.kind==='xp')state.tutorial.xp=true;else if(p.kind==='power'){state.tutorial.power=true;const power=C.POWERUPS.find(x=>x.id===p.power);player.buffs[power.id]=power.duration;toast(`${power.name} · ${power.duration} SEKUNDEN`);sfx('power');flashEffect('ring',p.x,p.y,power.color,.45,{r:72});}else sfx(p.kind);burst(p.x,p.y,p.kind==='coin'?'#ffd678':'#9cdbff',8,80);updateHud();return;}
     if(p.kind==='coin'){if(!adminMode){save.coins+=p.value;state.earnedCoins+=p.value;persist();}sfx('coin');burst(p.x,p.y,'#ffd678',7,75);}
     else if(p.kind==='xp'){if(!adminMode){save.xp+=p.value;state.earnedXp+=p.value;while(save.xp>=C.xpRequired(save.xpLevel)&&save.xpLevel<999){save.xp-=C.xpRequired(save.xpLevel);save.xpLevel++;save.skillPoints++;toast(`XP-STUFE ${save.xpLevel} · +1 PUNKT`);}persist();}sfx('xp');burst(p.x,p.y,'#9cdbff',7,75);}
     else{const power=C.POWERUPS.find(x=>x.id===p.power);if(power.id==='heal')player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.35);else player.buffs[power.id]=Math.max(player.buffs[power.id],power.duration);if(power.id==='rapid')for(const id in player.cooldowns)player.cooldowns[id]=0;toast(power.name);sfx('power');flashEffect('ring',p.x,p.y,power.color,.45,{r:72});}
     updateHud();
   }
-  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0)return;const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;state.flash=.17;burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
+  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0)return;if(state.mode==='tutorial'){player.invuln=.45;flashEffect('ring',player.x,player.y,'#78f6e5',.3,{r:30});return;}const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;state.flash=.17;burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
   function finish(won){
     if(state.mode!=='playing'||orientationBlocked)return;
     if(won)for(const p of [...pickups])if(p.kind==='coin'||p.kind==='xp')collectPickup(p);
@@ -277,6 +293,7 @@
   }
   function updateEnemy(e,dt){
     e.hit=Math.max(0,e.hit-dt);e.attackCd-=dt;e.attackAnim=Math.max(0,e.attackAnim-dt);e.slow=Math.max(0,e.slow-dt);e.phase+=dt;
+    if(e.type==='dummy')return;
     const d=dist(e,player)||1,dx=(player.x-e.x)/d,dy=(player.y-e.y)/d;e.angle=Math.atan2(dy,dx);
     const cover=firstCover(e.x,e.y,player.x,player.y,e.r*.5);
     const ranged=enemyDefs[e.type].ranged,ideal=e.type==='boss'?190:190;
@@ -317,7 +334,7 @@
   }
   function update(dt){
     if(state.toastTimer>0){state.toastTimer-=dt;if(state.toastTimer<=0)$('toast').classList.add('hidden');}
-    if(state.mode!=='playing'||orientationBlocked)return;
+    if(!['playing','tutorial'].includes(state.mode)||orientationBlocked)return;
     state.time+=dt;updateMusic(dt);state.shake=Math.max(0,state.shake-dt*30);state.flash=Math.max(0,state.flash-dt);
     player.invuln=Math.max(0,player.invuln-dt);player.slowTimer=Math.max(0,player.slowTimer-dt);player.attackAnim=Math.max(0,player.attackAnim-dt);player.specialAnim=Math.max(0,player.specialAnim-dt);player.specialCooldown=Math.max(0,player.specialCooldown-dt);
     for(const id in player.cooldowns)player.cooldowns[id]=Math.max(0,player.cooldowns[id]-dt);
@@ -329,14 +346,15 @@
     moveCircle(player,v.x*speed*dt,v.y*speed*dt);const moved=Math.hypot(player.x-ox,player.y-oy);if(moved>.1)player.walk+=moved*.13;else player.walk*=.93;
     cameraToPlayer(dt);state.hpDisplay+=(Math.max(0,player.hp)-state.hpDisplay)*Math.min(1,dt*13);state.hpTrail+=(Math.max(0,player.hp)-state.hpTrail)*Math.min(1,dt*2.5);
     if(input.fire||input.keys.has(keys.fire))playerShoot();
-    if(state.spawned<state.toSpawn){state.spawnTimer-=dt;if(state.spawnTimer<=0){spawnEnemy();state.spawned++;state.spawnTimer=state.info.boss&&state.wave===3?2:clamp(.65-state.info.local*.008,.31,.65);}}
+    if(state.mode==='playing'&&state.spawned<state.toSpawn){state.spawnTimer-=dt;if(state.spawnTimer<=0){spawnEnemy();state.spawned++;state.spawnTimer=state.info.boss&&state.wave===3?2:clamp(.65-state.info.local*.008,.31,.65);}}
     for(const e of [...enemies])updateEnemy(e,dt);
     for(const p of [...bullets])updateProjectile(p,dt,bullets);for(const p of [...enemyBullets])updateProjectile(p,dt,enemyBullets);
-    updatePerks(dt);
+    if(state.mode==='playing')updatePerks(dt);
     for(const p of [...pickups]){p.t+=dt;p.life-=dt;const d=dist(p,player),magnet=95+save.upgrades.magnet*23+(player.buffs.magnet>0?190:0);if(d<magnet){p.x+=(player.x-p.x)*Math.min(1,dt*7);p.y+=(player.y-p.y)*Math.min(1,dt*7);}if(d<player.r+p.r+5)collectPickup(p);else if(p.life<=0)pickups.splice(pickups.indexOf(p),1);}
     for(const p of [...particles]){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.max(0,1-dt*2);p.vy*=Math.max(0,1-dt*2);p.life-=dt;if(p.life<=0)particles.splice(particles.indexOf(p),1);}
     for(const e of [...effects]){e.life-=dt;if(e.life<=0)effects.splice(effects.indexOf(e),1);}
-    if(state.spawned>=state.toSpawn&&enemies.length===0){state.waveWait+=dt;if(state.waveWait>1.25){if(state.wave<3)beginWave(state.wave+1);else finish(true);}}else state.waveWait=0;
+    if(state.mode==='tutorial')updateTutorial(dt,moved);
+    else if(state.spawned>=state.toSpawn&&enemies.length===0){state.waveWait+=dt;if(state.waveWait>1.25){if(state.wave<3)beginWave(state.wave+1);else finish(true);}}else state.waveWait=0;
     state.hudTimer-=dt;if(state.hudTimer<=0){updateHud();state.hudTimer=.08;}
   }
   function line(x1,y1,x2,y2,color,width=3){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
@@ -465,13 +483,14 @@
     const w=world.viewW,h=world.viewH;ctx.clearRect(0,0,w,h);ctx.fillStyle='#081725';ctx.fillRect(0,0,w,h);
     if(player&&state.mode!=='menu'){
       ctx.save();ctx.translate((state.shake?rand(-state.shake,state.shake):0)-world.cameraX,(state.shake?rand(-state.shake,state.shake):0)-world.cameraY);
-      drawTerrain();drawObstacles();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
+      drawTerrain();drawObstacles();drawTutorialMarker();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
       for(const e of enemies)drawMonster(e);
       if(save.perks.includes('orb')){const a=state.time*3.4,x=player.x+Math.cos(a)*64,y=player.y+Math.sin(a)*64;ctx.save();ctx.shadowColor='#8deaff';ctx.shadowBlur=18;circle(x,y,12,'#baf6ff');ctx.restore();}
       drawPlayer();drawEffects();for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);circle(p.x,p.y,p.r,p.color);}ctx.globalAlpha=1;ctx.restore();
     }
     if(state.flash>0){ctx.fillStyle=`rgba(255,78,73,${state.flash*.5})`;ctx.fillRect(0,0,w,h);}
   }
+  function drawTutorialMarker(){if(state.mode!=='tutorial'||state.tutorialStep!==3||!state.tutorial?.coverSpot)return;const p=state.tutorial.coverSpot;ctx.save();ctx.strokeStyle='#7af6e8';ctx.lineWidth=3;ctx.shadowColor='#7af6e8';ctx.shadowBlur=18;ctx.beginPath();ctx.arc(p.x,p.y,28+Math.sin(state.time*5)*4,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d5fffa';ctx.font='900 13px sans-serif';ctx.textAlign='center';ctx.fillText('DECKUNG',p.x,p.y-39);ctx.restore();}
   function frame(t){const elapsed=Math.min((t-(state.last||t))/1000,.12);state.last=t;state.accumulator+=elapsed;let steps=0;while(state.accumulator>=1/60&&steps<8){update(1/60);state.accumulator-=1/60;steps++;}if(steps===8)state.accumulator=0;draw();requestAnimationFrame(frame);}requestAnimationFrame(frame);
   function renderLevels(){
     $('mapGrid').innerHTML='';
@@ -514,16 +533,58 @@
   }
   function openSettings(){state.mode='menu';renderSettings();showScreen('settingsScreen');}
   const tutorialSteps=[
-    {icon:'✛',title:'WILLKOMMEN.',body:'Du kämpfst dich durch sechs Karten mit je 30 Levels. Am Ende jeder Karte wartet ein Boss.'},
-    {icon:'➤',title:'BEWEGEN.',body:'Auf dem Handy benutzt du den linken Joystick. Am Computer gelten die eingestellten Tasten oder die Pfeiltasten. X und Y sind gleich schnell.'},
-    {icon:'◎',title:'SCHIESSEN.',body:'Halte rechts FEUER gedrückt. Jede Waffe hat eine kurze Schusspause. Zielen kannst du am Computer mit der Maus; auf dem Handy wird das nächste sichtbare Monster anvisiert.'},
-    {icon:'◆',title:'SAMMELN.',body:'Besiegte Monster lassen Münzen und XP fallen. Leuchtende Powerups geben zum Beispiel vier Sekunden Dauerfeuer oder Unsterblichkeit.'},
-    {icon:'✦',title:'AUFRÜSTEN.',body:'Mit XP steigst du Stufen auf und erhältst Upgrade-Punkte. Im Shop kaufst du Waffen, automatische Perks und Helden-Skins mit eigenen Attacken.'},
-    {icon:'⚙',title:'ANPASSEN.',body:'In den Einstellungen regelst du Musik und SFX, änderst PC-Tasten und verschiebst die Handy-Buttons. Jetzt bist du bereit!'}
+    {icon:'➤',title:'BEWEGEN',body:'Handy: linker Stick. PC: WASD oder Pfeiltasten. Gehe ein Stück über das Trainingsfeld.',goal:'Lege 110 Schritte zurück'},
+    {icon:'◎',title:'SCHIESSEN',body:'Halte FEUER gedrückt oder nutze die Leertaste. Schüsse haben eine kurze Pause. Besiege die Zielpuppe.',goal:'Zielpuppe besiegen'},
+    {icon:'◆',title:'BEUTE SAMMELN',body:'Monster lassen Münzen und XP fallen. Berühre beide Symbole. Die Trainingsbeute wird nicht deinem Konto gutgeschrieben.',goal:'Münze und XP einsammeln'},
+    {icon:'▦',title:'DECKUNG NUTZEN',body:'Eine Wand stoppt Geschosse. Laufe zum leuchtenden Ring hinter der Wand und bleibe dort kurz stehen.',goal:'1 Sekunde in Deckung bleiben'},
+    {icon:'⚡',title:'POWERUP HOLEN',body:'Leuchtende Powerups helfen im Kampf. Sammle Dauerfeuer ein: Es verkürzt die Schusspause für 4 Sekunden.',goal:'Powerup berühren'},
+    {icon:'✦',title:'UPGRADE TESTEN',body:'XP gibt später Upgrade-Punkte. Münzen kaufen Waffen, Perks und Skins im Shop. Aktiviere hier ein kostenloses Probe-Upgrade.',goal:'Probe-Upgrade aktivieren'},
+    {icon:'✛',title:'BOSS BESIEGEN',body:'Jeder Kartenboss hat eigene Angriffe und eine Superattacke. Weiche den markierten Flächen aus und besiege den Übungswächter.',goal:'Übungswächter besiegen'}
   ];
-  function showTutorialStep(){const s=tutorialSteps[state.tutorialStep];$('tutorialCount').textContent=`${state.tutorialStep+1} / ${tutorialSteps.length}`;$('tutorialIcon').textContent=s.icon;$('tutorialTitle').textContent=s.title;$('tutorialBody').textContent=s.body;$('tutorialNext').innerHTML=state.tutorialStep===tutorialSteps.length-1?'SPIELEN <span>↗</span>':'WEITER <span>↗</span>';$('tutorialProgress').innerHTML=tutorialSteps.map((_,i)=>`<i class="${i<=state.tutorialStep?'active':''}"></i>`).join('');}
-  function startTutorial(startsGame=false){state.tutorialStartsGame=startsGame;state.tutorialStep=0;state.mode='tutorial';showTutorialStep();showScreen('tutorialScreen');}
-  function endTutorial(){save.tutorialDone=true;if(!adminMode)persist();if(state.tutorialStartsGame){state.mode='playing';state.last=performance.now();state.accumulator=0;showScreen(null);}else openMenu();}
+  function showTutorialStep(){
+    const done=state.mode==='tutorialComplete',s=tutorialSteps[Math.min(state.tutorialStep,6)];
+    $('tutorialScreen').classList.toggle('completed',done);$('tutorialCount').textContent=done?'GESCHAFFT':`${state.tutorialStep+1} / 7`;
+    $('tutorialIcon').textContent=done?'★':s.icon;$('tutorialTitle').textContent=done?'TUTORIAL GESCHAFFT':s.title;
+    $('tutorialBody').textContent=done?(state.tutorial.awarded?`Du erhältst einmalig ${state.tutorial.awarded} Münzen. Sie sind bereits deinem normalen Profil gutgeschrieben.`:'Du kennst jetzt alle Grundlagen. Den einmaligen Münzbonus hast du bereits erhalten.'):s.body;
+    $('tutorialGoal').textContent=done?'Alle 7 Aufgaben abgeschlossen':s.goal;
+    $('tutorialProgress').innerHTML=tutorialSteps.map((_,i)=>`<i class="${done||i<=state.tutorialStep?'active':''}"></i>`).join('');
+    $('tutorialUpgradeBtn').classList.toggle('hidden',done||state.tutorialStep!==5);
+    $('tutorialNext').classList.toggle('hidden',!done);$('tutorialNext').innerHTML=state.tutorialStartsGame?'LEVEL STARTEN <span>↗</span>':'ZUM MENÜ <span>↗</span>';
+    $('tutorialSkip').classList.toggle('hidden',done);updateHud();
+  }
+  function tutorialEnemy(type,x,y,hp,extra={}){
+    const d=enemyDefs[type];const e={id:nextEnemyId++,x,y,type,r:d.r,hp,maxHp:hp,speed:d.speed,damage:d.damage,coin:0,xp:0,angle:0,phase:0,walk:0,attackCd:.5,attackAnim:0,hit:0,slow:0,superCd:type==='boss'?0:0,charge:null,...extra};enemies.push(e);return e;
+  }
+  function setTutorialStep(step){
+    state.tutorialStep=step;const t=state.tutorial;
+    if(step===1){const x=clamp(player.x+190,70,2130),y=player.y;t.dummyDown=false;tutorialEnemy('dummy',x,y,54);flashEffect('ring',x,y,'#ffda96',.8,{r:55});}
+    if(step===3){const x=clamp(player.x+145,200,1850),y=player.y;t.coverWall={x,y:y-67,w:32,h:134,kind:'wall'};world.obstacles.push(t.coverWall);t.coverSpot={x:x-70,y};t.coverMove=0;t.coverHold=0;const guard=tutorialEnemy('skeleton',x+190,y,100,{speed:0,damage:0,trainingGuard:true});t.guardId=guard.id;}
+    if(step===4){world.obstacles=world.obstacles.filter(o=>o!==t.coverWall);enemies=enemies.filter(e=>e.id!==t.guardId);enemyBullets=[];t.power=false;const x=clamp(player.x+150,60,2140),y=player.y;pickups.push({kind:'power',power:'rapid',x,y,r:16,life:9999,t:0,training:true});}
+    if(step===5)t.upgraded=false;
+    if(step===6){state.wave=3;state.info.boss=true;t.bossDown=false;const x=clamp(player.x+270,70,2130),y=player.y;const boss=tutorialEnemy('boss',x,y,260,{speed:38,damage:0,attackCd:.2,superCd:0});flashEffect('ring',boss.x,boss.y,'#8df3e4',.8,{r:90});}
+    showTutorialStep();toast(`AUFGABE ${step+1}: ${tutorialSteps[step].title}`,1.4);
+  }
+  function updateTutorial(dt,moved){
+    const t=state.tutorial;if(!t)return;
+    if(state.tutorialStep===0){t.move+=moved;$('tutorialGoal').textContent=`${Math.min(110,Math.floor(t.move))} / 110 Schritte`;if(t.move>=110)setTutorialStep(1);}
+    else if(state.tutorialStep===1&&t.dummyDown)setTutorialStep(2);
+    else if(state.tutorialStep===2){$('tutorialGoal').textContent=`Münze ${t.coin?'✓':'○'} · XP ${t.xp?'✓':'○'}`;if(t.coin&&t.xp)setTutorialStep(3);}
+    else if(state.tutorialStep===3){t.coverMove+=moved;const guard=enemies.find(e=>e.id===t.guardId),inPlace=dist(player,t.coverSpot)<42&&guard&&!!firstCover(guard.x,guard.y,player.x,player.y,4);t.coverHold=inPlace&&t.coverMove>=30?t.coverHold+dt:0;$('tutorialGoal').textContent=`Deckung: ${Math.min(1,t.coverHold).toFixed(1)} / 1,0 s`;if(t.coverHold>=1)setTutorialStep(4);}
+    else if(state.tutorialStep===4&&t.power)setTutorialStep(5);
+    else if(state.tutorialStep===5&&t.upgraded)setTutorialStep(6);
+    else if(state.tutorialStep===6&&t.bossDown)completeInteractiveTutorial();
+  }
+  function startTutorial(startsGame=false){
+    requestLandscape();state.tutorialStartsGame=startsGame;state.tutorial={move:0,coin:false,xp:false,power:false,upgraded:false,bossDown:false,awarded:0};
+    state.level=Math.min(save.unlocked,C.MAX_LEVEL);state.info={...C.levelInfo(1),map:trainingMap,boss:false};state.wave=1;state.toSpawn=0;state.spawned=0;state.time=0;state.musicTimer=0;state.musicNote=0;state.tutorialStep=0;
+    enemies=[];bullets=[];enemyBullets=[];particles=[];pickups=[];effects=[];generateTutorialArena();
+    const maxHp=100+save.upgrades.health*24;player={x:1100,y:1100,r:16,hp:maxHp,maxHp,angle:0,walk:0,attackAnim:0,specialAnim:0,specialCooldown:0,invuln:0,slowTimer:0,cooldowns:{},perkTimers:{},buffs:{rapid:0,invincible:0,double:0,magnet:0,slow:0}};
+    state.hpDisplay=maxHp;state.hpTrail=maxHp;state.mode='tutorial';input.fire=false;input.keys.clear();cameraToPlayer(1);activateAudio();showScreen('tutorialScreen');showTutorialStep();
+  }
+  function completeInteractiveTutorial(){
+    state.tutorial.awarded=C.completeTutorial(save,adminMode);persist();state.mode='tutorialComplete';input.fire=false;renderMenu();showScreen('tutorialScreen');showTutorialStep();sfx('power');toast(state.tutorial.awarded?`+${state.tutorial.awarded} MÜNZEN · EINMALIG`:'TUTORIAL GESCHAFFT',2.8);
+  }
+  function skipTutorial(){if(state.mode!=='tutorial')return;if(!adminMode){save.tutorialSkipped=true;persist();}if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();}
   function openMenu(){state.mode='menu';input.fire=false;renderMenu();showScreen('menu');}
   function pause(){if(state.mode!=='playing')return;state.mode='paused';input.fire=false;showScreen('pauseScreen');}
   function resume(){if(state.mode!=='paused')return;state.mode='playing';state.last=performance.now();state.accumulator=0;showScreen(null);}
@@ -531,7 +592,7 @@
   $('playBtn').onclick=()=>startLevel(Math.min(save.unlocked,C.MAX_LEVEL));$('levelsBtn').onclick=openLevels;$('shopBtn').onclick=()=>openShop(false);$('settingsBtn').onclick=openSettings;$('tutorialBtn').onclick=()=>startTutorial(false);
   document.querySelectorAll('[data-back="menu"]').forEach(b=>b.onclick=backFromPanel);
   document.querySelectorAll('#shopTabs button').forEach(b=>b.onclick=()=>{state.shopTab=b.dataset.tab;renderShop();});
-  $('profileBtn').onclick=changeProfile;$('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialNext').onclick=()=>{if(state.tutorialStep<tutorialSteps.length-1){state.tutorialStep++;showTutorialStep();}else endTutorial();};$('tutorialSkip').onclick=endTutorial;
+  $('profileBtn').onclick=changeProfile;$('tutorialAgainBtn').onclick=()=>startTutorial(false);$('tutorialUpgradeBtn').onclick=()=>{if(state.mode!=='tutorial'||state.tutorialStep!==5)return;player.trainingBonus=true;state.tutorial.upgraded=true;flashEffect('ring',player.x,player.y,'#a4ffdf',.6,{r:90});sfx('power');toast('PROBE-UPGRADE: +12 SCHADEN');};$('tutorialNext').onclick=()=>{if(state.mode!=='tutorialComplete')return;if(state.tutorialStartsGame)startLevel(Math.min(save.unlocked,C.MAX_LEVEL));else openMenu();};$('tutorialSkip').onclick=skipTutorial;
   $('pauseBtn').onclick=pause;$('resumeBtn').onclick=resume;$('restartBtn').onclick=()=>startLevel(state.level);$('shopFromPause').onclick=()=>openShop(true);$('menuFromPause').onclick=openMenu;
   $('resultShop').onclick=()=>openShop(false);$('resultMenu').onclick=openMenu;
   function keyOf(e){return e.key.toLowerCase();}
@@ -543,7 +604,7 @@
   addEventListener('keyup',e=>input.keys.delete(keyOf(e)));
   addEventListener('blur',()=>{input.keys.clear();input.fire=false;if(state.mode==='playing')pause();});
   canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){const r=canvas.getBoundingClientRect();input.mouseX=e.clientX-r.left;input.mouseY=e.clientY-r.top;input.mouseAim=true;}});
-  canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&state.mode==='playing'){const r=canvas.getBoundingClientRect();input.fire=true;input.mouseX=e.clientX-r.left;input.mouseY=e.clientY-r.top;input.mouseAim=true;activateAudio();}});
+  canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&(state.mode==='playing'||state.mode==='tutorial')){const r=canvas.getBoundingClientRect();input.fire=true;input.mouseX=e.clientX-r.left;input.mouseY=e.clientY-r.top;input.mouseAim=true;activateAudio();}});
   addEventListener('pointerup',e=>{if(e.pointerType==='mouse')input.fire=false;});
   const stick=$('joystick'),knob=$('joystickKnob');
   function moveJoy(e){const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,limit=r.width*.33,len=Math.hypot(dx,dy)||1,m=Math.min(limit,len);input.joyX=dx/len*m/limit;input.joyY=dy/len*m/limit;knob.style.transform=`translate(${dx/len*m}px,${dy/len*m}px)`;}
@@ -558,7 +619,7 @@
   for(const control of [fire,stick]){for(const name of ['touchstart','touchmove','touchend'])control.addEventListener(name,e=>e.preventDefault(),{passive:false});control.addEventListener('dblclick',e=>e.preventDefault());control.addEventListener('contextmenu',e=>e.preventDefault());}
   $('app').addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});$('app').addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.mode==='playing')pause();});
-  if(location.hostname==='localhost'||location.hostname==='127.0.0.1')window.__SIEGE_QA__={snapshot:()=>({mode:state.mode,level:state.level,map:state.info.map.id,player:player?{x:player.x,y:player.y,hp:player.hp,cooldowns:{...player.cooldowns},buffs:{...player.buffs}}:null,enemies:enemies.map(e=>({type:e.type,hp:e.hp,x:e.x,y:e.y})),pickups:pickups.map(p=>({kind:p.kind,power:p.power})),coins:save.coins,xp:save.xp,xpLevel:save.xpLevel}),startLevel,spawnEnemy,finish,collectPickup:kind=>{if(!player)return;const p={kind,power:kind==='power'?'rapid':undefined,x:player.x,y:player.y,r:9,value:100,life:10,t:0};pickups.push(p);collectPickup(p);},setPlayer:(x,y)=>{if(player){player.x=x;player.y=y;cameraToPlayer(1);}},step:update};
+  if(location.hostname==='localhost'||location.hostname==='127.0.0.1')window.__SIEGE_QA__={snapshot:()=>({mode:state.mode,level:state.level,map:state.info.map.id,tutorialStep:state.tutorialStep,tutorial:state.tutorial?{...state.tutorial}:null,player:player?{x:player.x,y:player.y,hp:player.hp,cooldowns:{...player.cooldowns},buffs:{...player.buffs}}:null,enemies:enemies.map(e=>({type:e.type,hp:e.hp,x:e.x,y:e.y})),pickups:pickups.map(p=>({kind:p.kind,power:p.power,x:p.x,y:p.y})),coins:save.coins,xp:save.xp,xpLevel:save.xpLevel,rewardClaimed:save.tutorialRewardClaimed}),startLevel,startTutorial,spawnEnemy,finish,collectPickup:kind=>{if(!player)return;const p={kind,power:kind==='power'?'rapid':undefined,x:player.x,y:player.y,r:9,value:100,life:10,t:0};pickups.push(p);collectPickup(p);},setPlayer:(x,y)=>{if(player){player.x=x;player.y=y;cameraToPlayer(1);}},step:update};
   applySettings();renderMenu();showScreen('menu');
   if((location.hostname==='localhost'||location.hostname==='127.0.0.1')&&new URLSearchParams(location.search).has('qaBoss')){
     const args=new URLSearchParams(location.search),mapIndex=C.MAPS.findIndex(m=>m.id===args.get('qaBoss'));

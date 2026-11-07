@@ -17,6 +17,15 @@
 .health-wrap.critical #hpFill{background:linear-gradient(90deg,#d95654,#ff9872);box-shadow:0 0 15px #ff7869}
 @media(max-width:720px){.health-wrap{width:138px}.health-track{height:10px}}
 
+/* Interactive training map: compact guidance while movement and fire stay available. */
+.tutorial-screen{z-index:5;pointer-events:none}
+.tutorial-card{position:absolute;top:110px;left:max(16px,env(safe-area-inset-left));width:min(320px,39vw);padding:15px 17px 13px;background:#0b2232ec;border:1px solid #62cfc7;box-shadow:0 10px 32px #0008,0 0 22px #5de9d421;pointer-events:none;backdrop-filter:blur(6px)}
+.tutorial-card-top{display:flex;align-items:center;gap:10px}.tutorial-card-top .eyebrow{display:flex;justify-content:space-between;flex:1;font-size:9px;letter-spacing:.12em;color:#83e8df}.tutorial-card-top b{color:#fff}.tutorial-icon{display:grid;place-items:center;width:27px;height:27px;flex:none;border:1px solid #77e9df;background:#1b5158;color:#c1fff8;font-size:17px}
+.tutorial-card h2{font-size:26px;line-height:1;margin:9px 0 5px;color:#ebfffa;letter-spacing:.02em}.tutorial-card p{color:#c4dbe0;font-size:11px;line-height:1.4;margin:0}.tutorial-goal{color:#8cf6e9;font-size:11px;font-weight:900;letter-spacing:.05em;margin-top:9px}.tutorial-goal:before{content:'◎ ';color:#ffd48a}.tutorial-progress{display:flex;gap:4px;justify-content:flex-start;margin:9px 0 0}.tutorial-progress i{width:28px;max-width:calc((100% - 24px)/7);height:4px;background:#42616a}.tutorial-progress i.active{background:#6cf0e6}.tutorial-action,.tutorial-skip{pointer-events:auto}.tutorial-action{width:100%;min-height:36px;margin-top:9px;border:0;background:#60e7de;color:#0a2530;font-size:10px;font-weight:900;letter-spacing:.08em}.tutorial-skip{display:block;margin-top:8px;padding:4px 0;border:0;background:transparent;color:#a9c9d0;font-size:9px;font-weight:800;letter-spacing:.08em}.tutorial-skip:hover{color:#fff}
+.tutorial-screen.completed{background:#020b16bc;backdrop-filter:blur(4px);pointer-events:auto}.tutorial-screen.completed .tutorial-card{top:50%;left:50%;transform:translate(-50%,-50%);width:min(430px,calc(100vw - 36px));padding:24px;pointer-events:auto;border-color:#ffd382}.tutorial-screen.completed .tutorial-card h2{font-size:39px;color:#ffe2a4}.tutorial-screen.completed .tutorial-card p{font-size:13px}.tutorial-screen.completed .tutorial-goal{color:#ffe0a0}
+@media(max-width:960px) and (max-height:590px){.tutorial-card{top:98px;width:min(300px,37vw);padding:10px 12px}.tutorial-card h2{font-size:22px;margin:6px 0 3px}.tutorial-card p{font-size:10px;line-height:1.3}.tutorial-goal{margin-top:6px;font-size:10px}.tutorial-progress{margin-top:6px}.tutorial-skip{margin-top:5px}}
+@media(max-width:720px){.tutorial-card{top:101px;width:min(265px,40vw)}}
+
 /* Version 3: maps, progression, powerups and configurable controls */
 .menu-actions{grid-template-columns:repeat(2,minmax(0,190px))}
 .menu-actions .secondary-button{min-height:49px;font-size:11px}
