@@ -10,3 +10,7 @@
 | Benannte Heldenskins | Namen/Farben in `dist/core.js:59–67`, Canvas-Zeichnung | Nutzungsrechte an bekannten Drittfiguren nicht dokumentiert; vor öffentlicher Weiterentwicklung klären oder eigenständige Figuren einsetzen. |
 
 Diese Liste ist eine Bestandsaufnahme, keine Rechtefreigabe. Neue Assets sind künftig einzeln mit Quelle und Lizenz zu ergänzen.
+
+## Zyklus 1 · Arbeitsbranch
+
+`gameforge/cycle-1-local-font` ersetzt die externen Schriftdeklarationen durch geräteseitige Systemfonts. Es wurde keine Fontdatei und kein neues Asset hinzugefügt. Die Tabelle oben bleibt die Dokumentation des v12-Ausgangsstands; ein Release ist für Zyklus 1 noch nicht freigegeben.
