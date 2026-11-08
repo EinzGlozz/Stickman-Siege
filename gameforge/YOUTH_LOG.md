@@ -18,3 +18,11 @@
 **Auflagen:** (1) Externe Font-Anfrage beseitigen und Netzwerk prüfen. (2) Rechte an Figurennamen/Designs belegen oder eigene Figuren einsetzen; Asset-Lizenzen dokumentieren. (3) Touchziele auf mindestens 48×48 px bringen. (4) Kleine Texte und Tutorialverständnis real prüfen. (5) Schadens-Flash und Bosswarnungen auf Frequenz, Form und Kontrast prüfen. (6) Konflikt zwischen früherer Querformat-Vorgabe und neuer Hoch-/Querformat-Anforderung vor Umbau klären.
 
 Für einen größeren Release empfiehlt der Agent Tests mit Kindern/Jugendlichen mit Einverständnis ihrer Eltern. Eine USK-/PEGI-Einstufung wurde nicht vorgenommen.
+
+## Zyklus 1 · Build-Review · 8. November 2026
+
+**Urteil: AUFLAGEN, keine Build-Freigabe.** Der CSS-Diff entfernt den externen Font-Import, ohne Gewalt-, Kauf- oder Datensammelmechaniken hinzuzufügen. Vollständiger Netz-/SW-Beleg und Layout-/Touchprüfung fehlen. Persona A/B/C bleiben Simulationen. Bestehende Befunde zu kleinen Touchzielen, Kleinschrift und bekannten Drittfiguren sind offene, getrennte Folgefelder. Vor größerem Release echte Jugendtests mit Einverständnis der Eltern erwägen; keine rechtliche Einstufung.
+
+## Zyklus 2 · Build-Review · 8. November 2026
+
+**VETO gegen Annahme des unabhängigen v12-Branches:** Die alte externe Font-Anfrage besteht in `dist/style.css:1` fort. Die Skin-Umgestaltung ist im Konzept geeignet und erhält Coin-Käufe, aber Originalität im gerenderten Gesamtbild, echter Browser-Altstand, Touch und Handy-Leistung sind ungeprüft. Persona-Aussagen sind Simulationen. Aufhebung erst nach freigegebenem Font-Fix und erneuter Prüfung; keine Rechtsberatung.
