@@ -52,12 +52,13 @@
   ];
   const SKINS = [
     {id:'soldier',name:'SIEGE',cost:0,body:'#e6f9f8',accent:'#59e9e5',attack:'Pulsfeuer',power:'normal'},
-    {id:'spider',name:'SPIDER-MAN',cost:2200,body:'#ec514d',accent:'#4b88ed',attack:'Netzschuss',power:'web'},
-    {id:'bat',name:'BATMAN',cost:2700,body:'#31394c',accent:'#f4d45f',attack:'Batarang',power:'bat'},
-    {id:'wolverine',name:'WOLVERINE',cost:3100,body:'#f6cf50',accent:'#3b5b9d',attack:'Klauenhieb',power:'claw'},
-    {id:'hulk',name:'HULK',cost:3500,body:'#7bcb6c',accent:'#6a4c98',attack:'Schockwelle',power:'smash'},
-    {id:'iron',name:'IRON MAN',cost:3900,body:'#d34e48',accent:'#f7c75d',attack:'Repulsorstrahl',power:'laser'},
-    {id:'thor',name:'THOR',cost:4400,body:'#7c9dca',accent:'#f2cc80',attack:'Blitzkette',power:'lightning'},
+    // Stable legacy ids preserve purchased skins in existing saves and backups.
+    {id:'spider',icon:'◇',name:'EISLOTSE',cost:2200,body:'#e4f4ee',accent:'#287a82',attack:'Frostlinse',power:'frost'},
+    {id:'bat',icon:'◎',name:'ORBITWÄCHTER',cost:2700,body:'#47375f',accent:'#65d4cf',attack:'Orbitscheibe',power:'orbit'},
+    {id:'wolverine',icon:'◜',name:'KUPFERDUELLANT',cost:3100,body:'#65465d',accent:'#e4a56d',attack:'Sichelbogen',power:'crescent'},
+    {id:'hulk',icon:'▣',name:'BASALTWÄCHTER',cost:3500,body:'#4c6677',accent:'#f0b36e',attack:'Bodenring',power:'quake'},
+    {id:'iron',icon:'△',name:'PRISMENLOTSE',cost:3900,body:'#223f5a',accent:'#ff927f',attack:'Prismastrahl',power:'prism'},
+    {id:'thor',icon:'⌁',name:'FUNKENARCHIVAR',cost:4400,body:'#f1e9d5',accent:'#a879cc',attack:'Kettenfunken',power:'chain'},
     {id:'ninja',name:'SCHATTENNINJA',cost:5200,body:'#56557c',accent:'#ba7df7',attack:'Schattenklinge',power:'shadow'}
   ];
   const POWERUPS = [
