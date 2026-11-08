@@ -10,3 +10,11 @@
 | Benannte Heldenskins | Namen/Farben in `dist/core.js:59–67`, Canvas-Zeichnung | Nutzungsrechte an bekannten Drittfiguren nicht dokumentiert; vor öffentlicher Weiterentwicklung klären oder eigenständige Figuren einsetzen. |
 
 Diese Liste ist eine Bestandsaufnahme, keine Rechtefreigabe. Neue Assets sind künftig einzeln mit Quelle und Lizenz zu ergänzen.
+
+## Zyklus 2 · eigenständige Skins im Arbeitsbranch
+
+Eislotse, Orbitwächter, Kupferduellant, Basaltwächter, Prismenlotse und Funkenarchivar bestehen aus neuem Canvas-Zeichencode in `dist/game.js` und Dateneinträgen in `dist/core.js`. Quelle: projektintern entworfen; keine neue fremde Grafik- oder Audiodatei. Die Formen sind geometrisch (Finne, Ring, Bügel, Block, Linse, Spulen). Die unveränderten internen IDs dienen ausschließlich dazu, alte Käufe in Spielständen zu erhalten. Eine juristische Rechteprüfung oder Freigabe des gesamten Bestands ist damit nicht behauptet.
+
+## Zyklus 1 · Arbeitsbranch
+
+`gameforge/cycle-1-local-font` ersetzt die externen Schriftdeklarationen durch geräteseitige Systemfonts. Es wurde keine Fontdatei und kein neues Asset hinzugefügt. Die Tabelle oben bleibt die Dokumentation des v12-Ausgangsstands; ein Release ist für Zyklus 1 noch nicht freigegeben.
