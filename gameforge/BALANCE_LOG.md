@@ -16,3 +16,11 @@
 Belege: `dist/core.js:8–18,27,81–84` und `dist/game.js:208,385,393`; Berechnung des Balancer-Agenten. Der Startblaster hat rechnerisch 41,86 Roh-DPS, mit Schadensstufe 1 etwa 51,16 und mit Feuerratenstufe 1 etwa 46,51. Diese statischen Werte erlauben keine Aussage zur tatsächlichen Upgrade-Wahl oder Erfolgsquote.
 
 **Nächste Messlücke:** Eine reproduzierbare Spiel-/Bot-Schnittstelle muss in einem eigenen Zyklus entstehen, bevor Spielzeit, Schwierigkeit und Inflation belastbar beurteilt werden können.
+
+## Zyklus 1 · Build-Review · 8. November 2026
+
+**Status: WARNUNG.** Der Schriftwechsel ändert laut Diff nur `dist/style.css`; 21/21 Tests bestehen. Startblaster, Wellen, Upgrade-/XP-Preise und Bossposition sind statisch unverändert. **Wertänderungen: 0.** Empirische Verhaltensgleichheit bleibt ohne Botläufe offen; die kritischen Zyklus-0-Befunde zu Mehrschuss und Bosszeit bleiben bestehen. Der QA-Status für Urteil B lautet NICHT BESTANDEN wegen anderer offener Nachweise.
+
+## Zyklus 2 · Build-Review · 8. November 2026
+
+**Status: WARNUNG.** Sechs Skin-Identitäten ändern sichtbare Daten und Zeichnung, aber keine Preise oder numerischen Spezialwerte. 0 Wertänderungen. Ein mit v12-Code aus `main` erzeugter Stand und Backup erhalten sechs Käufe; 23/23 Tests bestehen. Kauf-/Trefferquoten und Handy-FPS/Heap fehlen. Die Mehrschuss- und Bosszeit-Befunde bleiben separate Aufgaben.
