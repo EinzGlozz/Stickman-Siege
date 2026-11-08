@@ -65,7 +65,7 @@ Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dies
 - **Schwierigere Wellen:** Mehr Gegner pro Welle, etwas stärkere Gegner in späteren Wellen und längere normale Schusspausen. Das Powerup Dauerfeuer bleibt deutlich schneller.
 - **Beute und Entwicklung:** Jeder besiegte Gegner lässt Münzen und XP fallen. Dazu kommen zufällige Powerups wie 4 Sekunden Dauerfeuer, Unsterblichkeit, Doppelschaden, Super-Magnet und Zeitlupe.
 - **Ausrüstung:** Acht teurer werdende Upgrades, sechs Waffen, drei gleichzeitig ausrüstbare Waffen und zwei automatische Perks wie Pfeile, Ziegel oder Fußbälle.
-- **Skins:** Spider-Man, Batman, Wolverine, Hulk, Iron Man, Thor und Schattenninja kosten Münzen und besitzen eigene Spezialattacken und Animationen. Die Figuren sind Fan-Inhalte; es besteht keine Verbindung zu den Rechteinhabern.
+- **Skins:** Eislotse, Orbitwächter, Kupferduellant, Basaltwächter, Prismenlotse, Funkenarchivar und Schattenninja kosten erspielte Münzen und besitzen eigene Spezialattacken und Animationen. Die Figuren und ihre Canvas-Grafik sind für Stickman Siege entworfen. Bestehende Skin-Käufe bleiben durch unveränderte interne Speicherkennungen erhalten.
 - **Steuerung und Klang:** Einstellbare Lautstärken für Musik und Effekte, frei belegbare Computertasten und anpassbare Positionen der Handy-Buttons. Die Musik wird im Browser erzeugt und wechselt im Bosskampf das Tempo.
 - **Admin-Testprofil:** Im versteckten Admin-Labor lässt sich ein lokales Testprofil mit unbegrenzten Ressourcen und allen Freischaltungen aktivieren. Es ist kein Online-Konto und bietet keine Zugriffssicherheit.
 
