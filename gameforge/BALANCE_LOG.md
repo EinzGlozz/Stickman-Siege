@@ -1,0 +1,18 @@
+# GameForge – Balancing-Log
+
+## Zyklus 0 · 8. November 2026
+
+**Status: KRITISCH (statische Codeanalyse).** In Zyklus 0 wurden keine Werte geändert. Bot-Läufe und echte Spielzeitmessungen fehlen.
+
+| Kennzahl | Richtziel aus Team-Protokoll | Ermittelter Ist-Zustand |
+| --- | --- | --- |
+| Erster Boss | nach etwa 6–10 Minuten | Boss in Level 30. Selbst bei sofortigen Kills liegt die rechnerische Untergrenze für Level 1–29 bei 16,09 Minuten; Kampf- und Menüzeit kommt hinzu. |
+| Runde | 3–8 Minuten | Nicht gemessen; rechnerische Untergrenze für Level 1: 28,36 Sekunden. |
+| Erste Upgradechance | nach 1–2 Minuten | Billigstes Upgrade: 90 Münzen und 1 Skillpunkt; erster Skillpunkt bei 60 XP. Kaufzeit nicht gemessen. |
+| Anfänger-/Profi-Erfolg | Wellen- und Bossquoten laut Protokoll | Ohne Bot-Läufe nicht bestimmbar. |
+| Upgradevielfalt | keine wirkungslosen oder dominanten Wahlen | Mehrschuss-Stufen 1 und 3 gewähren durch `Math.floor(save.upgrades.multi/2)` keinen zusätzlichen Schuss, kosten aber 180 beziehungsweise 416 Münzen und Skillpunkte. Dominanz anderer Upgrades nicht bestimmbar. |
+| Münz-/XP-Rate | Fortschritt ohne Inflation/Sackgasse | Bei vollständig gesammelten Drops in Level 1 rechnerisch 15,34 Münzen und 13,03 XP je Kill im Erwartungswert; echte Sammelrate nicht gemessen. |
+
+Belege: `dist/core.js:8–18,27,81–84` und `dist/game.js:208,385,393`; Berechnung des Balancer-Agenten. Der Startblaster hat rechnerisch 41,86 Roh-DPS, mit Schadensstufe 1 etwa 51,16 und mit Feuerratenstufe 1 etwa 46,51. Diese statischen Werte erlauben keine Aussage zur tatsächlichen Upgrade-Wahl oder Erfolgsquote.
+
+**Nächste Messlücke:** Eine reproduzierbare Spiel-/Bot-Schnittstelle muss in einem eigenen Zyklus entstehen, bevor Spielzeit, Schwierigkeit und Inflation belastbar beurteilt werden können.
