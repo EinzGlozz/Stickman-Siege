@@ -20,3 +20,13 @@ Belege: `dist/core.js:8–18,27,81–84` und `dist/game.js:208,385,393`; Berechn
 ## Zyklus 1 · Build-Review · 8. November 2026
 
 **Status: WARNUNG.** Der Schriftwechsel ändert laut Diff nur `dist/style.css`; 21/21 Tests bestehen. Startblaster, Wellen, Upgrade-/XP-Preise und Bossposition sind statisch unverändert. **Wertänderungen: 0.** Empirische Verhaltensgleichheit bleibt ohne Botläufe offen; die kritischen Zyklus-0-Befunde zu Mehrschuss und Bosszeit bleiben bestehen. Der QA-Status für Urteil B lautet NICHT BESTANDEN wegen anderer offener Nachweise.
+
+## Zyklus 2 · Build-Review · 8. November 2026
+
+**Status: WARNUNG.** Sechs Skin-Identitäten ändern sichtbare Daten und Zeichnung, aber keine Preise oder numerischen Spezialwerte. 0 Wertänderungen. Ein mit v12-Code aus `main` erzeugter Stand und Backup erhalten sechs Käufe; 23/23 Tests bestehen. Kauf-/Trefferquoten und Handy-FPS/Heap fehlen. Die Mehrschuss- und Bosszeit-Befunde bleiben separate Aufgaben.
+
+## Zyklus 3 · Startwerte · 8. November 2026
+
+**Status: WARNUNG.** Nur visuelle Trefferanzeige. Schadens-/Rüstungsformel, Schutzdauer 0,55 s (Tutorial 0,45 s), Kamerawackel-Startwert 7 und Partikelaufruf mit höchstens 12 vor Regler-Skalierung bleiben unverändert. Zwei kurze Konturbögen gemäß Feel-Spezifikation statt vom Balancer zunächst vorgeschlagener vier Segmente begrenzen den zusätzlichen Draw-Aufwand; die Unterscheidung zum geschlossenen Powerup-Ring ist in QA zu prüfen. Kein Gameplay-Konfigwert geändert. FPS und Speicher unter Last offen.
+
+Abschlussreview 9. November: **WARNUNG**, 0 Wertänderungen. QA-Trefferfälle bestehen; Ringdauer 0,24 s < Schutzzeit 0,55 s, daher kein Überlappen normaler Treffer-Ringe. Vorübergehend ein Effektobjekt mehr, keine zusätzlichen Partikel oder Tonereignisse. Bot-/Kampfkennzahlen, fünfminütige Handy-FPS und Speicher nicht gemessen; keine Merge-Freigabe.

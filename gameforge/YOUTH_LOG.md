@@ -22,3 +22,11 @@ Für einen größeren Release empfiehlt der Agent Tests mit Kindern/Jugendlichen
 ## Zyklus 1 · Build-Review · 8. November 2026
 
 **Urteil: AUFLAGEN, keine Build-Freigabe.** Der CSS-Diff entfernt den externen Font-Import, ohne Gewalt-, Kauf- oder Datensammelmechaniken hinzuzufügen. Vollständiger Netz-/SW-Beleg und Layout-/Touchprüfung fehlen. Persona A/B/C bleiben Simulationen. Bestehende Befunde zu kleinen Touchzielen, Kleinschrift und bekannten Drittfiguren sind offene, getrennte Folgefelder. Vor größerem Release echte Jugendtests mit Einverständnis der Eltern erwägen; keine rechtliche Einstufung.
+
+## Zyklus 2 · Build-Review · 8. November 2026
+
+**VETO gegen Annahme des unabhängigen v12-Branches:** Die alte externe Font-Anfrage besteht in `dist/style.css:1` fort. Die Skin-Umgestaltung ist im Konzept geeignet und erhält Coin-Käufe, aber Originalität im gerenderten Gesamtbild, echter Browser-Altstand, Touch und Handy-Leistung sind ungeprüft. Persona-Aussagen sind Simulationen. Aufhebung erst nach freigegebenem Font-Fix und erneuter Prüfung; keine Rechtsberatung.
+
+## Zyklus 3 · Build-Review · 9. November 2026
+
+**AUFLAGEN.** Schnell wechselnde Figurenanzeige und roter Vollbildimpuls im Code entfernt; statische Schutzbögen und HP bleiben. Visuelle Kampfprüfung, echter Handytest, Leistung, Netzbeleg und Zyklus-1-Abhängigkeit offen. Alte Drittfiguren und kleine Touchziele bestehen; die Zyklus-2-Assetnotiz ist als separate Branch-Historie gekennzeichnet. Keine Persona-Befragung und keine formale WCAG-Einstufung. Details: `CYCLE_3_BUILD_REVIEWS.md`.
