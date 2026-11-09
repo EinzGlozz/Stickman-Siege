@@ -51,3 +51,66 @@
 5. **Spielstand-Regressionsbeleg stärken:** Einen echten Spielstand einer veröffentlichten Vorversion mit Münzen, XP, Upgrades, Ausrüstung und Einstellungen vor und nach dem Build vergleichen; bei fehlendem Altstand die Grenze melden. Der synthetische Roundtrip bleibt als bereits bestandener Teiltest bestehen.
 
 **Lernhinweis an den DESIGNER:** Keine zweite Funktion und keinen kosmetischen Nebenfix ergänzen. Reiche gezielt die fehlenden Nachweise und aktualisierte QA-, Jugend- und Feel-Reviews ein; die nächste Entscheidung prüft nur diese Lücken und etwaige dadurch sichtbar gewordene Fehler.
+
+## Zyklus 2 · Urteil A · 8. November 2026
+
+**Urteil: GEWÄHLT – Idee 1 „Siege-Orden“.** Dies ist eine Ideenauswahl für den unabhängigen Arbeitsbranch, keine Build- oder Merge-Freigabe.
+
+**Begründung:** Die bekannten Namen und zugehörigen Figurengestalten sind die höchste noch offene inhaltliche Richterpriorität (`dist/core.js:53–62`, `dist/game.js:524–543`; Zyklus-0-Urteil Rang 2). Befürworter und Kritiker setzen nach ihrer zweiten Runde beide Idee 1 vor Ideen 2 und 3; der Jugendwächter sieht kein Konzept-Veto, verlangt aber eine vollständige eigenständige Gestaltung und Spielstand-Erhalt (`CYCLE_2_ROUND_1_2.md`). Der Game-Feel-Agent bestätigt Potenzial 4/5, bewertet den Aufwand jedoch als hoch und fordert klar unterschiedliche Silhouetten ohne zusätzliche Effektlast. Die sechs Figuren bilden hier **eine** zusammenhängende Skin-Identitätsänderung; wenn Name, Bild und Angriff nicht zusammen vollständig bearbeitet werden können, wird der Umfang nicht künstlich durch bloßes Umbenennen verkleinert. Der noch offene Fontverstoß des v12-Basestands und die fehlenden Geräte-/Leistungsdaten erlauben aus Urteil A ausdrücklich keine Veröffentlichung.
+
+**Auflagen für das Design und den Build:**
+
+1. Für jeden der sechs betroffenen Skins eine Prüftabelle mit neuem Namen, Farbverteilung, von Farbe unabhängig erkennbarer Silhouette, Symbol und Angriffsbild erstellen. Keine erkennbaren Anleihen an die bisherigen Spinnenaugen, Fledermausohren/-umhänge, Dreifachklauen, Brustreaktoren oder Hämmer; keine fremden Namen in sichtbaren Spieltexten oder README.
+2. Bestehende interne Skin-IDs, Besitz, aktive Auswahl, Münzpreise und Kampfwerte erhalten. Einen veröffentlichten Altstand sowie Backup-Roundtrip mit allen sechs gekauften Skins prüfen; Verlust eines Kaufs ist blockierend.
+3. Die sechs Formen und Spezialangriffe als Stickman-Cartoon ohne Blut gestalten. Warnsignale bleiben klar, Silhouetten auch ohne Farberkennung unterscheidbar; keine neuen Assets ohne dokumentierte Quelle/Lizenz und keine höheren Partikel-/Effektbudgets.
+4. Das Design in messbare E1…En-Kriterien zerlegen. QA prüft alle sechs Shop-Karten, Ausrüstung und Angriffsansichten, Save-Regression, Handy-/Desktop-Layouts und die geforderte mindestens fünfminütige Mobile-Leistung; ungemessene Werte ausdrücklich offen lassen.
+5. Der Branch basiert unabhängig auf v12. Der externe Font-Import aus Richterrang 1 bleibt eine separate Veröffentlichungssperre, bis Zyklus 1 angenommen oder die gleiche Regelverletzung in einem eigenständig bewerteten Fix beseitigt wurde. Keine Font-, Touch- oder Trefferfeedback-Änderung in Zyklus 2 verstecken.
+
+**Lernhinweis an den DESIGNER:** Die Aufgabe besteht in sechs konsistent **eigenständigen** Skin-Identitäten bei vollständig erhaltenem Besitz. Liefere pro Figur überprüfbare Vorher/Nachher-Belege; Quellcode-Namen allein sind weder Spielstandtest noch Rechteklärung.
+
+## Zyklus 2 · Urteil B · erste Prüfung · 8. November 2026
+
+**Urteil: ÜBERARBEITEN. Keine Annahme, kein Merge und keine Veröffentlichung.** Das Jugendwächter-**VETO** bleibt bindend, bis derselbe Wächter nach einer Überarbeitung ausdrücklich FREIGABE gibt.
+
+**Begründung:** `CYCLE_2_QA.md` meldet NICHT BESTANDEN: 23/23 Tests und ein mit v12-Code erzeugter Save-/Backup-Roundtrip sind bestanden, aber Figuren, Shop, Angriffe und Touch wurden nicht im Browser geprüft und die geforderte fünfminütige Handy-Leistung ist unbekannt. Der Jugendwächter belegt den weiterhin externen Font-Import in `dist/style.css:1` des unabhängigen v12-Branches; der in Zyklus 1 vorgeschlagene Fix ist noch nicht angenommen (`CYCLE_2_BUILD_REVIEWS.md`). Nach §4/12 verhindern das Veto und die fehlende Mobile-Performance eine Annahme. Balancer und Game-Feel-Agent melden WARNUNG; für einen neuen Laufzeitfehler oder beschädigte Käufe gibt es keinen Beleg, während die Originalität des gesamten visuellen Ergebnisses ohne gerenderte Ansichten offen bleibt.
+
+**Konkrete Überarbeitungs- und Prüfliste (höchstens fünf Punkte):**
+
+1. Den externen Font als **separate Zyklus-1-Änderung** zur Annahme bringen und Cycle 2 erst danach auf den freigegebenen Hauptstand aktualisieren. Anschließend den Jugendwächter den resultierenden Gesamtstand erneut auf externe Anfragen prüfen lassen und eine ausdrückliche FREIGABE einholen; den Font nicht als heimlichen zweiten Cycle-2-Fix einbauen.
+2. Alle sechs neuen Shop-Karten, ausgerüsteten Figuren und Spezialangriffe in 568×320, 667×300 und 1280×720 tatsächlich rendern und dokumentieren. Umrisse zusätzlich in Graustufen und kleiner Spielgröße prüfen; besonders BASALTWÄCHTER darf im Gesamtbild nicht weiter wie eine bekannte Riesen-/Faustfigur wirken.
+3. Einen **echten** Browser-Spielstand der veröffentlichten v12-Version mit gekauften sechs Skins, aktivem Skin, Münzen, XP und Upgrades vor und nach dem Build vergleichen. Der bestandene automatisierte v12-JSON-/Backup-Test bleibt erhalten; Datenverlust ist blockierend.
+4. Fünf Minuten hohe Kampf- und Effektlast auf einem repräsentativen Mittelklasse-Handy messen, FPS-Verlauf, Minimum/Perzentil und Speicher dokumentieren; mindestens 30 FPS im spielbaren Zustand nachweisen. Zusätzlich die betroffenen Kauf-/Ausrüstungs- und Touch-Flows auf dem Handy bedienen.
+5. QA-, Game-Feel- und Jugend-Reviews mit diesen tatsächlichen Ergebnissen erneut einreichen; nur visuell belegte Ähnlichkeiten oder Lesbarkeitsprobleme gezielt im Skin-Inhaltsumfang korrigieren, Kampfwerte und andere Funktionen unangetastet lassen.
+
+**Lernhinweis an den DESIGNER:** Die statisch nachgewiesene Save-Kompatibilität ist ein guter Teilbeleg, ersetzt jedoch weder einen echten Altstand noch die Bild- und Gerätetests. Halte die externen Font- und Leistungsfreigaben von der Skin-Gestaltung getrennt, damit der Richter Ursache und Wirkung pro Zyklus beurteilen kann.
+
+## Zyklus 3 · Urteil A · 8. November 2026
+
+**Urteil: GEWÄHLT – Idee 1 „Ruhiges Trefferfeedback“.** Dieses Urteil wählt nur die Designrichtung; es bewertet keinen Build und erteilt keine Merge-Freigabe.
+
+**Begründung:** Das wiederholte Ausblenden der Spielfigur und der rote Vollbildimpuls sind als Richterpriorität 3 mit Codebelegen dokumentiert (`dist/game.js:524,564`; Zyklus-0-Urteil). Befürworter und Kritiker setzen nach der zweiten Runde beide Idee 1 vor den übrigen Kandidaten; der Jugendwächter nennt Auflagen, aber kein Konzept-Veto (`CYCLE_3_ROUND_1_2.md`). Der Game-Feel-Agent sieht hohes Feel-Potenzial bei überschaubarem Aufwand, sofern eine segmentierte Schutzkontur und HP-Verlust den Treffer ohne große Blitzfläche anzeigen. Eine formale Verletzung von WCAG 2.3.1 ist aus der 18-Hz-Zeitbasis allein **nicht** nachgewiesen und wird nicht behauptet. Die Änderung ist als ein zusammenhängender Feedback-Eingriff kleiner als der Menü- oder Save-Umbau.
+
+**Auflagen für Design und Umsetzung:**
+
+1. Die Spielfigur während der kurzen Treffer-Schutzphase stetig sichtbar lassen und den roten Vollbildimpuls durch ein lokal begrenztes, ruhiges Signal ersetzen. Schutzphase und Schaden müssen auch ohne Ton und ohne Farberkennung durch Form, Position und HP-Verlust unterscheidbar sein; der bestehende geschlossene Unsterblichkeitsring darf nicht mit dem neuen Schutzsignal verwechselt werden.
+2. Keine HP-, Unverwundbarkeits-, Schadens-, Cooldown-, Audio- oder Balance-Werte ändern. Der neue Effekt verwendet höchstens das bisherige Partikel-/Draw-Budget und respektiert den vorhandenen Effektregler sowie `prefers-reduced-motion`; keine schnelle große Helligkeitsfläche ergänzen.
+3. Erfolgskriterien E1…En für Sichtbarkeit, Schadens-/Schutzsignal, Einstellungen, Bosschaos, Spielstand und Regression formulieren. QA soll Screenshots bei normaler und reduzierter Effektdichte in 568×320, 667×300 und Desktop sowie einen fünfminütigen Mobile-Lastlauf mit mindestens 30 FPS liefern; fehlende Messungen bleiben ausdrücklich offen.
+4. Der Branch enthält die noch **nicht** angenommene Zyklus-1-Systemschrift, aber keine Zyklus-2-Skin-Änderung. Vor einem Merge muss Zyklus 1 selbst Urteil B=ANNEHMEN erhalten oder die Abhängigkeit ohne ungeprüfte Nebenänderung neu bewertet werden. Alte Bestandsauflagen zu Touchflächen und Figurenrechten bleiben bestehen.
+
+**Lernhinweis an den DESIGNER:** Prüfe die Information, die das bisherige Blinken transportiert hat, bevor du es entfernst; die ruhige Alternative muss in einer dichten Kampfszene sichtbar bleiben. Bezeichne Browser- und Sinnesprüfungen als offen, solange sie nicht tatsächlich stattgefunden haben.
+
+## Zyklus 3 · Urteil B · erste Prüfung · 9. November 2026
+
+**Urteil: ÜBERARBEITEN. Keine Annahme, kein Merge und keine Veröffentlichung.** Dies ist die erste B-Prüfung; der vor ihr korrigierte Canvas-Pfadfehler zählt nicht als abgeschlossene B-Überarbeitungsrunde.
+
+**Begründung:** QA meldet insgesamt **NICHT BESTANDEN für Urteil B**, weil E2/E3 visuell, E4 in den drei Viewports und E6 auf einem Mittelklasse-Handy nicht geprüft wurden (`CYCLE_3_QA.md`). Die 21/21 Tests, isolierten Trefferfälle und Syntaxprüfungen bestehen; der im ersten Review gefundene Verbindungsstrich zwischen Schutzbögen wurde durch `moveTo` vor dieser Entscheidung korrigiert und erneut geprüft. Balancer und Game-Feel-Agent melden WARNUNG, der Jugendwächter AUFLAGEN ohne neues Veto (`CYCLE_3_BUILD_REVIEWS.md`); für eine neue Laufzeit- oder Save-Regression liegt kein Beleg vor. Der Branch hängt zusätzlich vom noch nicht angenommenen Zyklus 1 ab; dessen Font- und Geräte-Nachweise dürfen durch Zyklus 3 nicht stillschweigend als bestanden gelten. Die vom Protokoll verlangte mobile Leistung von mindestens 30 FPS ist unbekannt, daher ist ANNEHMEN ausgeschlossen.
+
+**Konkrete Änderungen und Nachprüfungen (maximal fünf):**
+
+1. **E2/E3 sichtbar prüfen:** je einen gültigen Treffer und eine laufende Schutzphase mit Effekten 0 und 100 sowie `prefers-reduced-motion` aufnehmen; Figur, zwei getrennte Bögen, HP-Verlust und die Unterscheidung vom geschlossenen Unsterblichkeitsring in Farbe und Graustufen beurteilen. Falls ein Signal untergeht oder verwechselt wird, ausschließlich seine lokale Form/Zeichnung nachbessern; keinen Vollbildimpuls zurückbringen.
+2. **E4 in Kampf prüfen:** bei 568×320, 667×300 und 1280×720 dichte Gegner- und Bosskampfszenen mit HUD, Projektilen und Warnflächen dokumentieren; Blick auf Clipping, Überlappung und erkennbare Schadens-/Schutzphase. Ein Startmenü-Screenshot ersetzt diese Kampfszenen nicht.
+3. **E6 auf echter Hardware messen:** mindestens fünf Minuten hohe Effektlast auf einem repräsentativen Mittelklasse-Handy, mit FPS-Verlauf, Minimum/Perzentil und Speicherentwicklung. Mindestens 30 FPS im spielbaren Zustand sind für ANNEHMEN erforderlich; ohne Messung bleibt E6 offen.
+4. **Elternbranch und Spielstand absichern:** Zyklus 1 muss zuvor ein eigenes Urteil B=ANNEHMEN erhalten, oder die Abhängigkeit muss gesondert auf einem freigegebenen Hauptstand neu bewertet werden. Danach 21 Tests, isolierte Trefferfälle, Netzwerk-/Offline-Verhalten und einen echten Alt-Spielstand gegen den endgültigen Kombinationsstand erneut prüfen; der aktuelle statische Save-Befund allein genügt nicht.
+5. QA, Jugendwächter und Game-Feel-Agent legen aktualisierte Reviews anhand der tatsächlichen Bilder/Messungen vor; insbesondere Ton-aus, Farbe-allein, Effekte 0 und Bosschaos prüfen. Alte Drittfiguren- und Touchziel-Befunde bleiben als separate Release-Auflagen sichtbar und werden nicht in diesen Trefferfeedback-Zyklus hineingemischt.
+
+**Lernhinweis an den DESIGNER:** Die isolierten Treffer- und Bogenpfadtests sind eine solide Codebasis, aber die beabsichtigte Entlastung ist eine Wahrnehmungsfrage. Dokumentiere die Kampfbilder und Messwerte, bevor du das neue Feedback als lesbarer oder sicherer bezeichnest.
