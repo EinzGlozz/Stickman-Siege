@@ -17,7 +17,7 @@
   function persist(){if(adminMode)return;try{localStorage.setItem('stickman-siege-v3',JSON.stringify(regular));}catch{}}
   function changeProfile(){adminMode=!adminMode;save=adminMode?admin:regular;try{localStorage.setItem('stickman-siege-profile',adminMode?'admin':'player');}catch{}renderAdminPanel();renderMenu();toast(adminMode?'ADMIN-PROFIL AKTIV':'SPIELER-PROFIL AKTIV');}
   function persistAdminOptions(){try{localStorage.setItem('stickman-siege-admin-options',JSON.stringify(adminOptions));}catch{}}
-  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,eliteSlot:-1,eliteSpawned:false,lootCompass:null,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,flash:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',settingsTab:'sound',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
+  const state={mode:'menu',screen:'menu',level:1,info:C.levelInfo(1),wave:1,spawned:0,toSpawn:0,spawnTimer:0,waveWait:0,eliteSlot:-1,eliteSpawned:false,lootCompass:null,kills:0,earnedCoins:0,earnedXp:0,time:0,last:0,accumulator:0,shake:0,toastTimer:0,hpDisplay:100,hpTrail:100,hudTimer:0,musicTimer:0,musicNote:0,shopTab:'upgrades',settingsTab:'sound',selectedMap:0,panelReturn:'menu',tutorialStep:0,tutorialStartsGame:false,tutorial:null};
   const trainingMap={...C.MAPS[0],name:'TRAININGSGELÄNDE',subtitle:'Dein erster Einsatz',ground:'#173d43',tile:'#29545a',line:'#8fe9dd55',accent:'#79f2e3',cover:'#3b7374',edge:'#a0dcd1',boss:'ÜBUNGSWÄCHTER'};
   const world={viewW:0,viewH:0,dpr:1,mapW:2200,mapH:2200,cameraX:0,cameraY:0,obstacles:[],decor:[]};
   const reducedMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -173,7 +173,7 @@
   function beginWave(wave){state.wave=wave;state.spawned=0;state.toSpawn=C.waveSize(state.info,wave);state.eliteSlot=state.info.local>=5&&!(state.info.boss&&wave===3)&&Math.random()<.2?Math.floor(Math.random()*state.toSpawn):-1;state.eliteSpawned=false;state.spawnTimer=.5;state.waveWait=0;toast(wave===3&&state.info.boss?`${state.info.map.boss} ERWACHT`:`WELLE ${wave} / 3`);updateHud();}
   function startLevel(level){
     requestLandscape();
-    state.level=C.levelInfo(level).global;state.info=C.levelInfo(level);state.wave=1;state.kills=0;state.earnedCoins=0;state.earnedXp=0;state.time=0;state.shake=0;state.flash=0;state.musicTimer=0;state.musicNote=0;
+    state.level=C.levelInfo(level).global;state.info=C.levelInfo(level);state.wave=1;state.kills=0;state.earnedCoins=0;state.earnedXp=0;state.time=0;state.shake=0;state.musicTimer=0;state.musicNote=0;
     enemies=[];bullets=[];enemyBullets=[];particles=[];pickups=[];effects=[];generateArena();
     const maxHp=100+save.upgrades.health*24;
     player={x:1100,y:1100,r:16,hp:maxHp,maxHp,angle:0,walk:0,attackAnim:0,specialAnim:0,specialCooldown:0,invuln:0,slowTimer:0,cooldowns:{},perkTimers:{},buffs:{rapid:0,invincible:0,double:0,magnet:0,slow:0}};
@@ -314,7 +314,7 @@
     else{const power=C.POWERUPS.find(x=>x.id===p.power);if(power.id==='heal')player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.35);else player.buffs[power.id]=Math.max(player.buffs[power.id],power.duration);if(power.id==='rapid')for(const id in player.cooldowns)player.cooldowns[id]=0;toast(power.name);sfx('power');flashEffect('ring',p.x,p.y,power.color,.45,{r:72});}
     updateHud();
   }
-  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0||adminMode&&adminOptions.invincible)return;if(state.mode==='tutorial'){player.invuln=.45;flashEffect('ring',player.x,player.y,'#78f6e5',.3,{r:30});return;}const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;state.flash=.17;burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
+  function hurt(amount){if(!player||player.invuln>0||player.buffs.invincible>0||adminMode&&adminOptions.invincible)return;if(state.mode==='tutorial'){player.invuln=.45;if(save.settings.particles>0&&!reducedMotion)flashEffect('ring',player.x,player.y,'#78f6e5',.3,{r:30});return;}const dmg=Math.max(1,amount*(1-save.upgrades.armor*.07));player.hp-=dmg;player.invuln=.55;state.shake=7;if(save.settings.particles>0&&!reducedMotion)flashEffect('ring',player.x,player.y,'#ffd58a',.24,{r:40});burst(player.x,player.y,'#8ae5e8',12,130);sfx('hurt');updateHud();if(player.hp<=0)finish(false);}
   function finish(won){
     if(state.mode!=='playing'||orientationBlocked)return;
     if(won)for(const p of [...pickups])if(p.kind==='coin'||p.kind==='xp')collectPickup(p);
@@ -371,7 +371,7 @@
   function update(dt){
     if(state.toastTimer>0){state.toastTimer-=dt;if(state.toastTimer<=0)$('toast').classList.add('hidden');}
     if(!['playing','tutorial'].includes(state.mode)||orientationBlocked)return;
-    state.time+=dt;updateMusic(dt);state.shake=Math.max(0,state.shake-dt*30);state.flash=Math.max(0,state.flash-dt);
+    state.time+=dt;updateMusic(dt);state.shake=Math.max(0,state.shake-dt*30);
     player.invuln=Math.max(0,player.invuln-dt);player.slowTimer=Math.max(0,player.slowTimer-dt);player.attackAnim=Math.max(0,player.attackAnim-dt);player.specialAnim=Math.max(0,player.specialAnim-dt);player.specialCooldown=Math.max(0,player.specialCooldown-dt);
     for(const id in player.cooldowns)player.cooldowns[id]=Math.max(0,player.cooldowns[id]-dt);
     for(const id in player.buffs)player.buffs[id]=Math.max(0,player.buffs[id]-dt);
@@ -521,7 +521,7 @@
     ctx.restore();
     if(e.hp<e.maxHp&&e.type!=='boss'){ctx.fillStyle='#1b1f2a';ctx.fillRect(e.x-20,e.y-e.r-30,40,4);ctx.fillStyle=e.elite?'#ffd978':color;ctx.fillRect(e.x-20,e.y-e.r-30,40*clamp(e.hp/e.maxHp,0,1),4);}
   }
-  function drawPlayer(){if(!player||(!player.buffs.invincible&&player.invuln>0&&Math.floor(state.time*18)%2))return;
+  function drawPlayer(){if(!player)return;
     const skin=C.SKINS.find(s=>s.id===save.skin)||C.SKINS[0],s=skin.id,b=skin.body,a=skin.accent,step=Math.sin(player.walk)*8,attack=player.attackAnim>0?Math.sin((.22-player.attackAnim)*15)*5:0;
     ctx.save();ctx.translate(player.x,player.y);circle(0,22,18,'#07161d88');ctx.lineCap='round';ctx.shadowColor=a;ctx.shadowBlur=12;
     if(s==='bat'||s==='thor'){ctx.fillStyle=s==='bat'?'#1a2030':'#b54c51';ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(-21,25);ctx.lineTo(0,18);ctx.lineTo(21,25);ctx.lineTo(8,-10);ctx.fill();}
@@ -544,6 +544,7 @@
     else if(s==='ninja'){line(-10,-25,9,-25,a,3);line(8,-25,18,-28,a,2);}
     else{circle(-4,-22,2,a);circle(4,-22,2,a);}
     if(player.buffs.invincible>0||player.buffs.double>0){ctx.strokeStyle=player.buffs.invincible>0?'#86fff0':'#ff9f81';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,31+Math.sin(state.time*8)*2,0,6.29);ctx.stroke();}
+    if(player.invuln>0&&player.buffs.invincible<=0){ctx.strokeStyle='#5a3518';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,-2,27,-2.75,-.65);ctx.moveTo(27*Math.cos(.4),-2+27*Math.sin(.4));ctx.arc(0,-2,27,.4,2.5);ctx.stroke();ctx.strokeStyle='#ffd58a';ctx.lineWidth=2.5;ctx.stroke();}
     ctx.restore();
   }
   function drawEffects(){for(const e of effects){const f=clamp(e.life/e.max,0,1);ctx.save();ctx.globalAlpha=f;ctx.shadowColor=e.color;ctx.shadowBlur=14;
@@ -554,14 +555,13 @@
   function draw(){
     const w=world.viewW,h=world.viewH;ctx.clearRect(0,0,w,h);ctx.fillStyle='#081725';ctx.fillRect(0,0,w,h);
     if(player&&state.mode!=='menu'){
-      const shake=state.shake*save.settings.shake/100;ctx.save();ctx.translate((shake?rand(-shake,shake):0)-world.cameraX,(shake?rand(-shake,shake):0)-world.cameraY);
+      const shake=reducedMotion?0:state.shake*save.settings.shake/100;ctx.save();ctx.translate((shake?rand(-shake,shake):0)-world.cameraX,(shake?rand(-shake,shake):0)-world.cameraY);
       drawTerrain();drawAmbientLights();drawObstacles();drawTutorialMarker();drawBossTelegraphs();for(const p of pickups)drawPickup(p);for(const p of bullets)drawProjectile(p);for(const p of enemyBullets)drawProjectile(p);
       for(const e of enemies)drawMonster(e);
       if(save.perks.includes('orb')){const a=state.time*3.4,x=player.x+Math.cos(a)*64,y=player.y+Math.sin(a)*64;ctx.save();ctx.shadowColor='#8deaff';ctx.shadowBlur=18;circle(x,y,12,'#baf6ff');ctx.restore();}
       drawPlayer();drawEffects();for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);circle(p.x,p.y,p.r,p.color);}ctx.globalAlpha=1;ctx.restore();
     }
     drawLootCompass();
-    if(state.flash>0){ctx.fillStyle=`rgba(255,78,73,${state.flash*.5})`;ctx.fillRect(0,0,w,h);}
   }
   function drawTutorialMarker(){if(state.mode!=='tutorial'||state.tutorialStep!==3||!state.tutorial?.coverSpot)return;const p=state.tutorial.coverSpot;ctx.save();ctx.strokeStyle='#7af6e8';ctx.lineWidth=3;ctx.shadowColor='#7af6e8';ctx.shadowBlur=18;ctx.beginPath();ctx.arc(p.x,p.y,28+Math.sin(state.time*5)*4,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d5fffa';ctx.font='900 13px sans-serif';ctx.textAlign='center';ctx.fillText('DECKUNG',p.x,p.y-39);ctx.restore();}
   function frame(t){const elapsed=Math.min((t-(state.last||t))/1000,.12);state.last=t;state.accumulator+=elapsed;let steps=0;while(state.accumulator>=1/60&&steps<8){update(1/60);state.accumulator-=1/60;steps++;}if(steps===8)state.accumulator=0;draw();requestAnimationFrame(frame);}requestAnimationFrame(frame);
