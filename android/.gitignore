@@ -1,0 +1,6 @@
+/toolchain/
+/build/
+/private/
+*.jks
+*.p12
+*.pass

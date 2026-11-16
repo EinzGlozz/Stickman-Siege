@@ -1,0 +1,11 @@
+{
+  "apk": "Stickman-Siege-Android.apk",
+  "sha256": "a764e14f57c7d22f7ecddae50d95bd0908fb41cb4bf6fc349a435ac568313019",
+  "bytes": 78851,
+  "minSdk": 26,
+  "targetSdk": 35,
+  "package": "io.github.einzglozz.stickmansiege",
+  "sourceBaseCommit": "3efaa0975820aac054094d32fb1ccd4f5998c307",
+  "gameJsSha256": "f45aa4f3d056305319530b183e7bd724614cf54fc6e3e8f3657275537af2303f",
+  "coreJsSha256": "af81fbd5b25267e04ce604e49b24e3d2eb6a142f5f01e0a6913732e610d39ac0"
+}
