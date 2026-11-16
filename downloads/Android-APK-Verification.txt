@@ -1,0 +1,36 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Stickman Siege, O=Local Development
+Signer #1 certificate SHA-256 digest: 1990ad5ddcd8b1f0ef8b9dde67395e3715a582bb2addbf3dedf7dea20c37f5e0
+Signer #1 certificate SHA-1 digest: e43f9da1d7d162ed398375d5597cabe4c4da283d
+Signer #1 certificate MD5 digest: a327361809834fface6254747ce67106
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: 994d9779d0c19577da4257f52058d127d9d5390ddcaae0c861cba6a16d854ef4
+Signer #1 public key SHA-1 digest: da3d51563d100972d72751c56f12c25110b672c6
+Signer #1 public key MD5 digest: 63a23ece2c1f7c7361522d488e43c410
+
+package: name='io.github.einzglozz.stickmansiege' versionCode='1' versionName='0.1.0-endless-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+minSdkVersion:'26'
+targetSdkVersion:'35'
+application-label:'Stickman Siege'
+application-icon-160:'res/drawable-nodpi-v4/ic_launcher.png'
+application-icon-65535:'res/drawable-nodpi-v4/ic_launcher.png'
+application: label='Stickman Siege' icon='res/drawable-nodpi-v4/ic_launcher.png'
+launchable-activity: name='io.github.einzglozz.stickmansiege.MainActivity'  label='' icon=''
+feature-group: label=''
+  uses-feature: name='android.hardware.faketouch'
+  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'
+  uses-feature: name='android.hardware.screen.landscape'
+  uses-implied-feature: name='android.hardware.screen.landscape' reason='one or more activities have specified a landscape orientation'
+main
+supports-screens: 'small' 'normal' 'large' 'xlarge'
+supports-any-density: 'true'
+locales: '--_--'
+densities: '160' '65535'

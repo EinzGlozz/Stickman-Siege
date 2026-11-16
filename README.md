@@ -1,5 +1,11 @@
 # Stickman Siege · Version 12
 
+## Android-APK mit Endlosmodus (Testversion)
+
+[APK für Android herunterladen](https://raw.githubusercontent.com/EinzGlozz/Stickman-Siege/refs/heads/codex/android-apk/downloads/Stickman-Siege-Android.apk) · Android 8.0+ · Offline-App mit lokalem Spielstand. [Installation, Spielstandübernahme, Build und Testgrenzen](README-ANDROID.md).
+
+Die Test-APK enthält den lokalen Nachtgarten-Endlosmodus mit getrennten Runden-Upgrades. Der Android-Quellcode liegt unter `android/`, die tatsächlich gebündelte Webfassung unter `dist/`. Die bestehende Live-Site und der Hauptzweig werden nicht aktualisiert. Build und Signatur sind geprüft; eine Installation auf einem echten Android-Gerät steht noch aus.
+
 Ein 2D-Stickman-Shooter für Handy und Computer. Du kämpfst gegen Zombies, Skelette, Ghule, Golems, Geister und Dämonen, sammelst Münzen, XP und animierte Powerups, kaufst Upgrades und besiegst Kartenbosse.
 
 ## Sofort spielen und auf dem Handy installieren
@@ -16,7 +22,7 @@ Diese ChatGPT-Site ist derzeit für den Besitzerzugang freigegeben. Öffne den L
 | **iPhone / iPad** | Den Spiel-Link in **Safari** öffnen → **Teilen** → **Zum Home-Bildschirm** → **Hinzufügen**. |
 | **PC / Mac** | [Offline-Paket als ZIP herunterladen](downloads/Stickman-Siege-PC-v12.zip), entpacken und `index.html` öffnen. Das Browserfenster muss breiter als hoch sein. In Chrome oder Edge kann die Web-App über das Installationssymbol in der Adressleiste installiert werden. |
 
-Android und iOS verwenden dieselbe installierbare Web-App (PWA). Es gibt in dieser Version keine signierte APK- oder IPA-Datei. Für eine eigenständige Store-App wären Android-Buildwerkzeuge beziehungsweise ein Apple-Entwicklerkonto und Code-Signierung nötig. Das PC-ZIP enthält die Spieldateien für die Offline-Nutzung.
+Android und iOS verwenden dieselbe installierbare Web-App (PWA). Für Android gibt es zusätzlich die oben verlinkte signierte Test-APK; eine IPA-Datei für iOS gibt es nicht. Für eine eigenständige Store-App wären Android-Buildwerkzeuge beziehungsweise ein Apple-Entwicklerkonto und Code-Signierung nötig. Das PC-ZIP enthält die Spieldateien für die Offline-Nutzung.
 
 ## Neu in Version 12
 
